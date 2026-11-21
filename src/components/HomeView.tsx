@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { ArrowLeft, ArrowRight, Send } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { ArrowRight, Send, Star } from 'lucide-react';
 import {
-  CARD_IMAGES,
-  HERO_SLIDES,
+  DARK_HERO_ASSETS,
+  TELEGRAM_BOT_HANDLE,
   TELEGRAM_BOT_URL,
 } from '../data/studioData';
 import type { PortfolioItem, TabId } from '../types';
@@ -13,249 +13,374 @@ interface HomeViewProps {
   onOpenLightbox: (index: number) => void;
 }
 
+function formatChelyabinskTime(): string {
+  try {
+    return new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Asia/Yekaterinburg',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    }).format(new Date());
+  } catch {
+    const now = new Date();
+    let hours = now.getHours();
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+    return `${hours}:${minutes} ${ampm}`;
+  }
+}
+
 export function HomeView({
   portfolioItems,
   onNavigate,
   onOpenLightbox,
 }: HomeViewProps) {
-  const [slideIndex, setSlideIndex] = useState(0);
-  const currentSlide = HERO_SLIDES[slideIndex];
+  const rootRef = useRef<HTMLDivElement>(null);
+  const heroWrapperRef = useRef<HTMLDivElement>(null);
+  const [clock, setClock] = useState<string>(() => formatChelyabinskTime());
   const previewWorks = portfolioItems.slice(0, 4);
 
-  const handlePrevSlide = () => {
-    setSlideIndex((prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
-  };
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setClock(formatChelyabinskTime());
+    }, 30000);
+    return () => window.clearInterval(timer);
+  }, []);
 
-  const handleNextSlide = () => {
-    setSlideIndex((prev) => (prev + 1) % HERO_SLIDES.length);
-  };
+  // 1. Intersection Observer for .reveal elements
+  useEffect(() => {
+    const container = rootRef.current;
+    if (!container) return;
+
+    const elements = container.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '0px 0px -40px 0px',
+      }
+    );
+
+    elements.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
+
+  // 2. Hero Scroll Parallax + Opposite Card Parallax
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrolled = window.scrollY;
+
+      if (heroWrapperRef.current && scrolled < 1000) {
+        heroWrapperRef.current.style.transform = `translateY(${scrolled * 0.35}px)`;
+        heroWrapperRef.current.style.opacity = String(
+          Math.max(0, 1 - scrolled / 600)
+        );
+      }
+
+      const container = rootRef.current;
+      if (!container) return;
+
+      container.querySelectorAll<HTMLElement>('.parallax-card-up').forEach((el) => {
+        el.style.setProperty('--scroll-offset-up', `${scrolled * -0.04}px`);
+      });
+      container
+        .querySelectorAll<HTMLElement>('.parallax-card-down')
+        .forEach((el) => {
+          el.style.setProperty('--scroll-offset-down', `${scrolled * 0.04}px`);
+        });
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <div className="flex flex-col gap-5">
-      {/* Hero section */}
-      <section className="relative overflow-hidden rounded-2xl border border-[#EAEAEA] bg-white">
-        {/* Background photography with soft left-to-right fade */}
-        <div className="pointer-events-none absolute inset-0">
-          <img
-            src={currentSlide.image}
-            alt={currentSlide.imageAlt}
-            referrerPolicy="no-referrer"
-            className="h-full w-full object-cover object-right opacity-60 transition-opacity duration-300"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/90 to-white/15" />
+    <div ref={rootRef} className="flex flex-col bg-[#050505] text-white">
+      {/* 1. Dark Atmospheric Hero with Floating Surrealist Hands & Scroll Parallax */}
+      <section className="relative flex min-h-[88vh] items-center justify-center overflow-hidden bg-[#050505] px-6 py-24">
+        {/* Background Atmosphere */}
+        <div className="pointer-events-none absolute inset-0 z-0 select-none">
+          <div className="absolute inset-0 opacity-65 mix-blend-screen">
+            <img
+              src={DARK_HERO_ASSETS.atmosphere}
+              alt="Darkroom light atmosphere"
+              referrerPolicy="no-referrer"
+              className="h-full w-full object-cover object-center opacity-85"
+            />
+          </div>
+          <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent via-transparent to-[#050505]" />
         </div>
 
-        <div className="relative z-10 flex min-h-[380px] flex-col justify-between p-6 sm:p-10 lg:min-h-[430px] lg:p-12">
-          {/* Top kicker */}
-          <div className="flex items-center gap-4">
-            <span className="text-[11px] font-medium tracking-[0.24em] text-[#404040]">
-              {currentSlide.kicker}
-            </span>
-            <span className="hidden h-px w-20 bg-[#141414]/45 sm:inline-block" />
-          </div>
+        {/* Floating Left Hand */}
+        <div className="animate-float-left pointer-events-none absolute -left-[10%] -top-[6%] z-10 w-[52vw] max-w-[540px] opacity-85 mix-blend-screen md:-left-[4%] md:-top-[10%] md:w-[36vw]">
+          <img
+            src={DARK_HERO_ASSETS.handLeft}
+            alt=""
+            aria-hidden="true"
+            referrerPolicy="no-referrer"
+            className="h-auto w-full object-contain brightness-110 contrast-125 [mask-image:radial-gradient(ellipse_at_center,black_42%,transparent_75%)]"
+          />
+        </div>
 
-          {/* Center headline & lead */}
-          <div className="my-8 max-w-xl">
-            <h1 className="font-editorial text-5xl font-normal tracking-[0.04em] leading-none text-[#141414] sm:text-6xl lg:text-[74px]">
-              {currentSlide.title}
-            </h1>
-            <p className="mt-3 text-[11px] font-medium tracking-[0.32em] text-[#333333] sm:text-xs">
-              {currentSlide.subtitle}
-            </p>
-            <p className="mt-6 max-w-md text-[15px] leading-relaxed text-[#333333]">
-              {currentSlide.description}
-            </p>
+        {/* Floating Right Hand */}
+        <div className="animate-float-right pointer-events-none absolute -bottom-[6%] -right-[10%] z-10 w-[48vw] max-w-[500px] opacity-85 mix-blend-screen md:-bottom-[4%] md:-right-[4%] md:w-[32vw]">
+          <img
+            src={DARK_HERO_ASSETS.handRight}
+            alt=""
+            aria-hidden="true"
+            referrerPolicy="no-referrer"
+            className="h-auto w-full object-contain brightness-110 contrast-125 [mask-image:radial-gradient(ellipse_at_center,black_42%,transparent_75%)]"
+          />
+        </div>
 
-            <div className="mt-7 flex flex-wrap items-center gap-3">
+        {/* Hero Content */}
+        <div className="relative z-20 mx-auto flex max-w-4xl flex-col items-center text-center">
+          <div ref={heroWrapperRef}>
+            <div className="reveal active">
+              <p className="mb-4 text-xs font-medium uppercase tracking-[0.26em] text-[#FF4500]">
+                Фотограф в Челябинске
+              </p>
+              <h1 className="hero-glow font-editorial text-5xl font-medium leading-[1.08] tracking-tight text-[#ffe0e0] sm:text-7xl lg:text-[84px]">
+                EXPOSURE. <br />
+                <span className="font-light italic text-[#ffe0e0]">
+                  Искусство кадра.
+                </span>
+              </h1>
+            </div>
+
+            <div className="reveal active mt-6" style={{ transitionDelay: '200ms' }}>
+              <p className="hero-glow mx-auto max-w-lg text-base font-light leading-relaxed tracking-wide text-[#ffe0e0]/90 md:text-lg">
+                Мы превращаем мгновения в истории, к которым хочется
+                возвращаться. Коммерческая и частная фотография в Челябинске.
+              </p>
+            </div>
+
+            <div
+              className="reveal active mt-14 flex flex-col items-center gap-6"
+              style={{ transitionDelay: '400ms' }}
+            >
               <button
                 type="button"
                 onClick={() => onNavigate('booking')}
-                className="inline-flex items-center gap-2.5 rounded-full bg-[#141414] px-6 py-3 text-[13.5px] font-medium text-white whitespace-nowrap shrink-0 transition-colors hover:bg-[#2B2B2B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#141414] focus-visible:ring-offset-2"
+                className="group relative cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4500]"
               >
-                <span>Записаться на съёмку</span>
-                <ArrowRight className="h-4 w-4" />
+                <div className="absolute inset-0 rounded-full bg-[#FF4500]/25 blur-xl opacity-0 transition-opacity duration-500 group-hover:opacity-70" />
+                <div className="relative flex items-center gap-3 rounded-full border border-white/20 bg-white/5 px-7 py-2.5 text-xs uppercase tracking-[0.2em] text-white/90 backdrop-blur-sm transition-colors duration-300 group-hover:border-[#FF4500]/60 group-hover:bg-white/10 md:text-sm">
+                  <span>Записаться на съёмку</span>
+                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                </div>
               </button>
-            </div>
-          </div>
 
-          {/* Bottom-right carousel controls */}
-          <div className="flex items-center justify-end gap-3">
-            <span className="text-xs font-medium tabular-nums text-[#333333]">
-              0{slideIndex + 1} / 0{HERO_SLIDES.length}
-            </span>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={handlePrevSlide}
-                aria-label="Предыдущий слайд"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#141414]/35 bg-white/80 text-[#141414] transition-colors hover:bg-[#141414] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#141414]"
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </button>
-              <button
-                type="button"
-                onClick={handleNextSlide}
-                aria-label="Следующий слайд"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#141414]/35 bg-white/80 text-[#141414] transition-colors hover:bg-[#141414] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#141414]"
-              >
-                <ArrowRight className="h-4 w-4" />
-              </button>
+              <div className="mt-4 flex items-center gap-4 font-mono text-[10px] uppercase tracking-[0.2em] text-white/45 md:text-xs">
+                <span className="tabular-nums">{clock}</span>
+                <span className="h-3 w-px bg-white/20" />
+                <span>Челябинск, РФ</span>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 3-Column Bento Feature Cards */}
-      <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <button
-          type="button"
-          onClick={() => onNavigate('about')}
-          className="group relative flex min-h-[196px] flex-col justify-between overflow-hidden rounded-2xl p-6 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#141414]"
-        >
-          <img
-            src={CARD_IMAGES.about}
-            alt="Обо мне — светотень"
-            referrerPolicy="no-referrer"
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/55 to-black/25" />
-
-          <div className="relative z-10 max-w-[85%]">
-            <h2 className="font-editorial text-[26px] font-medium leading-tight text-white">
-              Обо мне
+      {/* 2. Mission Section */}
+      <section className="relative px-6 py-24 sm:py-32">
+        <div className="mx-auto max-w-4xl text-center">
+          <div className="reveal">
+            <h2 className="font-editorial text-3xl leading-tight text-white/95 md:text-5xl lg:text-6xl">
+              Мы снимаем пространство, в котором по-настоящему живёт ваш момент.
             </h2>
-            <p className="mt-2 text-[13px] leading-relaxed text-white/85">
-              Кто я, чем занимаюсь и почему фотография — моя страсть.
+            <p className="mt-10 text-lg font-light leading-relaxed text-gray-400 md:text-2xl">
+              Убираем лишний шум, оставляя чистый свет, характер и подлинную
+              эмоцию в каждом кадре.
             </p>
           </div>
 
-          <span className="relative z-10 mt-5 inline-flex items-center gap-2 text-xs font-medium text-white">
-            <span className="underline underline-offset-4">Узнать больше</span>
-            <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-1" />
-          </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => onNavigate('services')}
-          className="group relative flex min-h-[196px] flex-col justify-between overflow-hidden rounded-2xl p-6 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#141414]"
-        >
-          <img
-            src={CARD_IMAGES.services}
-            alt="Услуги и фотостудия"
-            referrerPolicy="no-referrer"
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/55 to-black/20" />
-
-          <div className="relative z-10 max-w-[85%]">
-            <h2 className="font-editorial text-[26px] font-medium leading-tight text-white">
-              Услуги
-            </h2>
-            <p className="mt-2 text-[13px] leading-relaxed text-white/85">
-              Фотосессии на любой случай — от портретов до мероприятий.
-            </p>
-          </div>
-
-          <span className="relative z-10 mt-5 inline-flex items-center gap-2 text-xs font-medium text-white">
-            <span className="underline underline-offset-4">Посмотреть цены</span>
-            <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-1" />
-          </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => onNavigate('news')}
-          className="group relative flex min-h-[196px] flex-col justify-between overflow-hidden rounded-2xl p-6 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#141414]"
-        >
-          <img
-            src={CARD_IMAGES.news}
-            alt="Новости и камера у окна"
-            referrerPolicy="no-referrer"
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/55 to-black/25" />
-
-          <div className="relative z-10 max-w-[85%]">
-            <h2 className="font-editorial text-[26px] font-medium leading-tight text-white">
-              Новости
-            </h2>
-            <p className="mt-2 text-[13px] leading-relaxed text-white/85">
-              Следите за обновлениями: новые проекты, акции и полезные советы.
-            </p>
-          </div>
-
-          <span className="relative z-10 mt-5 inline-flex items-center gap-2 text-xs font-medium text-white">
-            <span className="underline underline-offset-4">Читать новости</span>
-            <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-1" />
-          </span>
-        </button>
-      </section>
-
-      {/* Bottom Portfolio Strip + Telegram Questions Card */}
-      <section className="grid grid-cols-1 gap-4 rounded-2xl border border-[#EAEAEA] bg-white p-5 sm:p-6 xl:grid-cols-12 xl:items-center">
-        <div className="flex flex-col justify-between gap-4 xl:col-span-3">
-          <div>
-            <h2 className="font-editorial text-[26px] font-medium leading-tight text-[#141414]">
-              Портфолио
-            </h2>
-            <p className="mt-1 text-[13px] text-[#555555]">Примеры моих работ</p>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => onNavigate('portfolio')}
-            className="inline-flex w-fit items-center gap-2 text-xs font-medium text-[#141414] underline underline-offset-4 transition-opacity hover:opacity-70"
-          >
-            <span>Перейти в галерею</span>
-            <ArrowRight className="h-3.5 w-3.5" />
-          </button>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:col-span-5">
-          {previewWorks.map((item, idx) => (
+          <div className="mt-24 grid grid-cols-2 items-center justify-items-center gap-8 opacity-45 grayscale transition-all duration-500 hover:opacity-80 hover:grayscale-0 md:grid-cols-4">
             <button
-              key={item.id}
               type="button"
-              onClick={() => onOpenLightbox(idx)}
-              aria-label={`Открыть фотографию: ${item.title}`}
-              className="group relative aspect-square overflow-hidden rounded-xl bg-[#EAEAEA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#141414]"
+              onClick={() => onNavigate('portfolio')}
+              className="reveal text-base font-bold tracking-[0.22em] text-white transition-colors hover:text-[#FF4500] sm:text-lg"
             >
-              <img
-                src={item.image}
-                alt={item.title}
-                referrerPolicy="no-referrer"
-                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-black/0 transition-colors duration-200 group-hover:bg-black/20" />
+              ПОРТРЕТЫ
             </button>
-          ))}
+            <button
+              type="button"
+              onClick={() => onNavigate('services')}
+              className="reveal text-base font-bold tracking-[0.22em] text-white transition-colors hover:text-[#FF4500] sm:text-lg"
+              style={{ transitionDelay: '100ms' }}
+            >
+              КОММЕРЦИЯ
+            </button>
+            <button
+              type="button"
+              onClick={() => onNavigate('services')}
+              className="reveal text-base font-bold tracking-[0.22em] text-white transition-colors hover:text-[#FF4500] sm:text-lg"
+              style={{ transitionDelay: '200ms' }}
+            >
+              СВАДЬБЫ
+            </button>
+            <button
+              type="button"
+              onClick={() => onNavigate('portfolio')}
+              className="reveal text-base font-bold tracking-[0.22em] text-white transition-colors hover:text-[#FF4500] sm:text-lg"
+              style={{ transitionDelay: '300ms' }}
+            >
+              ГОРОД
+            </button>
+          </div>
         </div>
+      </section>
 
-        {/* Questions / Telegram CTA box */}
-        <div className="relative flex flex-col justify-between overflow-hidden rounded-2xl bg-[#F1F1F1] p-6 xl:col-span-4">
-          <Send
-            aria-hidden="true"
-            className="pointer-events-none absolute -right-2 top-3 h-16 w-16 -rotate-12 text-[#141414]/[0.06]"
-          />
-          <div>
-            <h2 className="font-editorial text-[24px] font-medium leading-tight text-[#141414]">
-              Остались вопросы?
+      {/* 3. Dual Parallax Cards Section (B2B & B2C) */}
+      <section className="relative overflow-hidden px-6 py-24 sm:py-32">
+        <div className="dot-matrix-bg pointer-events-none absolute left-1/2 top-1/2 h-[120%] w-[120%] -translate-x-1/2 -translate-y-1/2 opacity-15" />
+
+        <div className="relative z-10 mx-auto max-w-5xl">
+          <div className="reveal mb-20 text-center sm:mb-28">
+            <h2 className="font-editorial text-4xl sm:text-6xl md:text-7xl">
+              Выберите формат <br />
+              <span className="italic text-[#ffe0e0]">вашей съёмки</span>
             </h2>
-            <p className="mt-1.5 text-[13px] leading-relaxed text-[#4A4A4A]">
-              Напишите мне — я отвечу в ближайшее время
-            </p>
           </div>
 
-          <a
-            href={TELEGRAM_BOT_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#E0E0E0] bg-white px-4 py-2.5 text-[13px] font-medium text-[#141414] whitespace-nowrap transition-colors hover:border-[#141414] hover:bg-[#141414] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#141414]"
-          >
-            <Send className="h-3.5 w-3.5" />
-            <span>Написать в Telegram</span>
-          </a>
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+            {/* Card 01 — Vermilion #FF4500 */}
+            <div className="parallax-card-down">
+              <button
+                type="button"
+                onClick={() => onNavigate('services')}
+                className="reveal group flex aspect-[4/5] w-full cursor-pointer flex-col justify-between rounded-3xl bg-[#FF4500] p-8 text-left shadow-2xl transition-all duration-500 hover:shadow-[0_20px_50px_rgba(255,69,0,0.35)] sm:p-11"
+              >
+                <div className="flex w-full items-start justify-between">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-black/10 transition-transform duration-500 group-hover:rotate-45">
+                    <Star className="h-6 w-6 text-black" />
+                  </div>
+                  <span className="rounded-full border border-black/20 px-3 py-1 text-sm font-medium text-black tabular-nums">
+                    01
+                  </span>
+                </div>
+
+                <div>
+                  <h3 className="font-editorial text-4xl leading-none tracking-tight text-black sm:text-5xl">
+                    B2B <br />
+                    Для бизнеса
+                  </h3>
+                  <p className="mt-4 text-base leading-snug text-black/80 sm:text-lg">
+                    Рекламная и имиджевая съёмка, каталоги и лукбуки,
+                    бизнес-репортажи и контент для личного бренда.
+                  </p>
+                </div>
+
+                <div className="mt-6 flex w-full items-center justify-between border-t border-black/15 pt-4 text-xs font-semibold uppercase tracking-[0.16em] text-black">
+                  <span>Открыть услуги B2B</span>
+                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                </div>
+              </button>
+            </div>
+
+            {/* Card 02 — Dark Obsidian #111111 */}
+            <div className="parallax-card-up md:mt-24">
+              <button
+                type="button"
+                onClick={() => onNavigate('services')}
+                className="reveal group flex aspect-[4/5] w-full cursor-pointer flex-col justify-between rounded-3xl border border-white/10 bg-[#111111] p-8 text-left shadow-2xl transition-all duration-500 hover:border-[#FF4500]/50 sm:p-11"
+                style={{ transitionDelay: '150ms' }}
+              >
+                <div className="flex w-full items-start justify-between">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/5 transition-transform duration-500 group-hover:scale-110">
+                    <ArrowRight className="h-6 w-6 -rotate-45 text-white" />
+                  </div>
+                  <span className="rounded-full border border-white/15 px-3 py-1 text-sm font-medium text-white/60 tabular-nums">
+                    02
+                  </span>
+                </div>
+
+                <div>
+                  <h3 className="font-editorial text-4xl leading-none tracking-tight text-white sm:text-5xl">
+                    B2C <br />
+                    Личные истории
+                  </h3>
+                  <p className="mt-4 text-base leading-snug text-gray-400 sm:text-lg">
+                    Фото свадьбы, семейные и детские фотосессии, выпускные
+                    альбомы и индивидуальные портреты.
+                  </p>
+                </div>
+
+                <div className="mt-6 flex w-full items-center justify-between border-t border-white/10 pt-4 text-xs font-semibold uppercase tracking-[0.16em] text-white/80 group-hover:text-[#FF4500]">
+                  <span>Открыть услуги B2C</span>
+                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Portfolio Preview + Telegram CTA Strip */}
+      <section className="mx-auto w-full max-w-5xl px-6 pb-20">
+        <div className="reveal grid grid-cols-1 gap-6 rounded-3xl border border-white/10 bg-[#111111] p-6 sm:p-8 lg:grid-cols-12 lg:items-center">
+          <div className="flex flex-col justify-between gap-4 lg:col-span-3">
+            <div>
+              <h2 className="font-editorial text-3xl text-white">Портфолио</h2>
+              <p className="mt-1 text-sm text-gray-400">Примеры моих работ</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => onNavigate('portfolio')}
+              className="inline-flex w-fit items-center gap-2 text-xs font-medium uppercase tracking-[0.14em] text-[#FF4500] transition-opacity hover:opacity-80"
+            >
+              <span>Вся галерея</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:col-span-5">
+            {previewWorks.map((item, idx) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => onOpenLightbox(idx)}
+                aria-label={`Открыть фотографию: ${item.title}`}
+                className="group relative aspect-square overflow-hidden rounded-xl border border-white/10 bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4500]"
+              >
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  referrerPolicy="no-referrer"
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              </button>
+            ))}
+          </div>
+
+          <div className="flex flex-col justify-between rounded-2xl border border-white/10 bg-[#080808] p-6 lg:col-span-4">
+            <div>
+              <h3 className="font-editorial text-2xl text-white">
+                Остались вопросы?
+              </h3>
+              <p className="mt-1.5 text-xs leading-relaxed text-gray-400">
+                Напишите напрямую в Telegram-бот {TELEGRAM_BOT_HANDLE} — отвечу
+                в ближайшее время.
+              </p>
+            </div>
+
+            <a
+              href={TELEGRAM_BOT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-4 py-2.5 text-xs font-semibold text-black whitespace-nowrap transition-all hover:scale-[1.02] hover:bg-[#FF4500] hover:text-black"
+            >
+              <Send className="h-3.5 w-3.5" />
+              <span>Написать в Telegram</span>
+            </a>
+          </div>
         </div>
       </section>
     </div>

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { AboutView } from './components/AboutView';
 import { BookingView } from './components/BookingView';
 import { ContactsView } from './components/ContactsView';
+import { Footer } from './components/Footer';
 import { HomeView } from './components/HomeView';
 import { Lightbox } from './components/Lightbox';
 import { NewsView } from './components/NewsView';
@@ -31,6 +32,7 @@ export function App() {
   const [activeTab, setActiveTab] = useState<TabId>('home');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [scrolled, setScrolled] = useState(false);
 
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>(() =>
     loadStoredArray(STORAGE_KEYS.portfolio, DEFAULT_PORTFOLIO)
@@ -38,6 +40,14 @@ export function App() {
   const [newsItems, setNewsItems] = useState<NewsItem[]>(() =>
     loadStoredArray(STORAGE_KEYS.news, DEFAULT_NEWS)
   );
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     try {
@@ -60,7 +70,7 @@ export function App() {
 
   const handleNavigate = (tab: TabId) => {
     setActiveTab(tab);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
   const handleAddPhoto = (item: PortfolioItem) => {
@@ -81,16 +91,19 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5] text-[#141414] lg:flex">
+    <div className="relative min-h-screen bg-[#050505] text-white lg:flex">
+      <div className="noise-overlay" aria-hidden="true" />
+
       <Sidebar
         activeTab={activeTab}
         onSelectTab={handleNavigate}
         mobileMenuOpen={mobileMenuOpen}
         onToggleMobileMenu={() => setMobileMenuOpen((prev) => !prev)}
+        scrolled={scrolled}
       />
 
-      <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">
-        <div className="mx-auto max-w-[1220px]">
+      <div className="flex min-w-0 flex-1 flex-col">
+        <main className="flex-1">
           {activeTab === 'home' && (
             <HomeView
               portfolioItems={portfolioItems}
@@ -125,8 +138,10 @@ export function App() {
           {activeTab === 'about' && <AboutView onNavigate={handleNavigate} />}
 
           {activeTab === 'contacts' && <ContactsView />}
-        </div>
-      </main>
+        </main>
+
+        <Footer onNavigate={handleNavigate} />
+      </div>
 
       <Lightbox
         items={portfolioItems}

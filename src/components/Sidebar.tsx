@@ -19,6 +19,7 @@ interface SidebarProps {
   onSelectTab: (tab: TabId) => void;
   mobileMenuOpen: boolean;
   onToggleMobileMenu: () => void;
+  scrolled?: boolean;
 }
 
 interface NavItem {
@@ -43,38 +44,45 @@ function ApertureLogo() {
       viewBox="0 0 48 48"
       fill="none"
       aria-hidden="true"
-      className="h-9 w-9 text-[#141414]"
+      className="h-9 w-9 text-[#ffe0e0]"
     >
-      <circle cx="24" cy="24" r="19" stroke="currentColor" strokeWidth="1.6" />
+      <circle cx="24" cy="24" r="19" stroke="currentColor" strokeWidth="1.5" />
       <path
         d="M24 5L29.5 20.5H43"
         stroke="currentColor"
-        strokeWidth="1.6"
+        strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M40.5 14.5L26 24L33.5 40.5"
         stroke="currentColor"
-        strokeWidth="1.6"
+        strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M33.5 40.5L21 27.5L7.5 33.5"
         stroke="currentColor"
-        strokeWidth="1.6"
+        strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M7.5 33.5L18.5 21.5L14.5 7.5"
         stroke="currentColor"
-        strokeWidth="1.6"
+        strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <circle cx="24" cy="24" r="5" fill="#FFFFFF" stroke="currentColor" strokeWidth="1.6" />
+      <circle
+        cx="24"
+        cy="24"
+        r="5"
+        fill="#050505"
+        stroke="#FF4500"
+        strokeWidth="1.6"
+      />
     </svg>
   );
 }
@@ -84,6 +92,7 @@ export function Sidebar({
   onSelectTab,
   mobileMenuOpen,
   onToggleMobileMenu,
+  scrolled = false,
 }: SidebarProps) {
   const handleSelect = (tab: TabId) => {
     onSelectTab(tab);
@@ -94,16 +103,22 @@ export function Sidebar({
 
   return (
     <>
-      {/* Mobile compact header (<= 15% viewport height) */}
-      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-[#E8E8E8] bg-white px-4 py-3 lg:hidden">
+      {/* Mobile sticky top bar with scroll blur transition */}
+      <header
+        className={`sticky top-0 z-30 flex items-center justify-between px-4 transition-all duration-500 lg:hidden ${
+          scrolled
+            ? 'border-b border-white/10 bg-[#050505]/85 py-3 backdrop-blur-md'
+            : 'border-b border-white/5 bg-[#050505] py-4'
+        }`}
+      >
         <button
           type="button"
           onClick={() => handleSelect('home')}
-          className="flex items-center gap-2.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#141414]"
+          className="flex items-center gap-2.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4500]"
         >
           <ApertureLogo />
-          <span className="font-editorial text-2xl font-medium tracking-[0.08em] text-[#141414] whitespace-nowrap">
-            EXPOSURE
+          <span className="font-editorial text-2xl font-medium tracking-tight text-white whitespace-nowrap">
+            EXPOSURE.
           </span>
         </button>
 
@@ -111,7 +126,7 @@ export function Sidebar({
           <button
             type="button"
             onClick={() => handleSelect('booking')}
-            className="rounded-full bg-[#141414] px-4 py-2 text-xs font-medium text-white whitespace-nowrap shrink-0 transition-colors hover:bg-[#2B2B2B]"
+            className="rounded-full bg-[#FF4500] px-4 py-2 text-xs font-semibold text-black whitespace-nowrap shrink-0 transition-transform hover:scale-105"
           >
             Записаться
           </button>
@@ -120,40 +135,39 @@ export function Sidebar({
             onClick={onToggleMobileMenu}
             aria-label={mobileMenuOpen ? 'Закрыть меню' : 'Открыть меню'}
             aria-expanded={mobileMenuOpen}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[#E5E5E5] text-[#141414] transition-colors hover:bg-[#F5F5F5]"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/5 text-white transition-colors hover:bg-white/15"
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </header>
 
-      {/* Mobile drawer overlay */}
+      {/* Mobile overlay */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/40 lg:hidden"
+          className="fixed inset-0 z-40 bg-black/75 backdrop-blur-sm lg:hidden"
           onClick={onToggleMobileMenu}
         />
       )}
 
-      {/* Sidebar rail */}
+      {/* Left Corner Sticky Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-[256px] shrink-0 flex-col justify-between border-r border-[#E8E8E8] bg-white px-5 py-7 transition-transform duration-200 lg:static lg:z-auto lg:w-[244px] lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-[256px] shrink-0 flex-col justify-between border-r border-white/10 bg-[#080808]/95 px-5 py-7 backdrop-blur-xl transition-transform duration-300 lg:sticky lg:top-0 lg:z-20 lg:h-screen lg:w-[244px] lg:translate-x-0 ${
           mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <div>
-          {/* Brand block */}
           <div className="flex items-center justify-between lg:justify-center">
             <button
               type="button"
               onClick={() => handleSelect('home')}
-              className="flex flex-col items-center text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#141414]"
+              className="flex flex-col items-center text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4500]"
             >
               <ApertureLogo />
-              <span className="mt-2 font-editorial text-[26px] font-medium tracking-[0.08em] leading-none text-[#141414]">
-                EXPOSURE
+              <span className="mt-2 font-editorial text-[26px] font-medium tracking-tight leading-none text-white">
+                EXPOSURE.
               </span>
-              <span className="mt-1.5 text-[9.5px] font-medium tracking-[0.22em] text-[#666666]">
+              <span className="mt-1.5 text-[9.5px] font-medium tracking-[0.22em] text-white/45">
                 PHOTOGRAPHY STUDIO
               </span>
             </button>
@@ -162,15 +176,14 @@ export function Sidebar({
               type="button"
               onClick={onToggleMobileMenu}
               aria-label="Закрыть меню"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[#555555] hover:bg-[#F5F5F5] lg:hidden"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-white/60 hover:bg-white/10 hover:text-white lg:hidden"
             >
               <X className="h-5 w-5" />
             </button>
           </div>
 
-          <div className="my-6 h-px w-full bg-[#EBEBEB]" />
+          <div className="my-6 h-px w-full bg-white/10" />
 
-          {/* Navigation tabs */}
           <nav aria-label="Основная навигация" className="flex flex-col gap-1.5">
             {NAV_ITEMS.map((item) => {
               const Icon = item.icon;
@@ -181,13 +194,17 @@ export function Sidebar({
                   type="button"
                   onClick={() => handleSelect(item.id)}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`flex w-full items-center gap-3 rounded-full px-4 py-2.5 text-left text-[13.5px] font-medium whitespace-nowrap shrink-0 transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#141414] ${
+                  className={`flex w-full items-center gap-3 rounded-full px-4 py-2.5 text-left text-[13.5px] font-medium whitespace-nowrap shrink-0 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4500] ${
                     isActive
-                      ? 'bg-[#141414] text-white'
-                      : 'text-[#333333] hover:bg-[#F3F3F3] hover:text-[#141414]'
+                      ? 'bg-[#FF4500] text-black shadow-[0_0_24px_rgba(255,69,0,0.35)]'
+                      : 'text-white/65 hover:bg-white/10 hover:text-white'
                   }`}
                 >
-                  <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-white' : 'text-[#555555]'}`} />
+                  <Icon
+                    className={`h-4 w-4 shrink-0 ${
+                      isActive ? 'text-black' : 'text-white/50'
+                    }`}
+                  />
                   <span className="truncate">{item.label}</span>
                 </button>
               );
@@ -195,9 +212,8 @@ export function Sidebar({
           </nav>
         </div>
 
-        {/* Bottom socials & tagline */}
         <div className="pt-6">
-          <div className="mb-5 h-px w-full bg-[#EBEBEB]" />
+          <div className="mb-5 h-px w-full bg-white/10" />
 
           <div className="flex items-center justify-center gap-3">
             <a
@@ -206,7 +222,7 @@ export function Sidebar({
               rel="noopener noreferrer"
               aria-label="Telegram-бот @photoguuuy_bot"
               title="Telegram: @photoguuuy_bot"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[#141414] transition-colors hover:bg-[#F2F2F2]"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/80 transition-all hover:border-[#FF4500] hover:bg-[#FF4500] hover:text-black"
             >
               <Send className="h-4 w-4" />
             </a>
@@ -215,7 +231,7 @@ export function Sidebar({
               onClick={() => handleSelect('contacts')}
               aria-label="Перейти к контактам"
               title="Контакты"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[#141414] transition-colors hover:bg-[#F2F2F2]"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/80 transition-colors hover:bg-white/15 hover:text-white"
             >
               <Mail className="h-4 w-4" />
             </button>
@@ -224,18 +240,18 @@ export function Sidebar({
               onClick={() => handleSelect('portfolio')}
               aria-label="Перейти в портфолио"
               title="Портфолио"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[#141414] transition-colors hover:bg-[#F2F2F2]"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/80 transition-colors hover:bg-white/15 hover:text-white"
             >
               <Camera className="h-4 w-4" />
             </button>
           </div>
 
-          <div className="mt-5 text-[11px] leading-relaxed text-[#737373]">
+          <div className="mt-5 text-[11px] leading-relaxed text-white/40">
             <div className="flex items-center gap-2">
-              <span>Capture</span>
-              <span className="h-px flex-1 bg-[#DCDCDC]" />
+              <span>Челябинск</span>
+              <span className="h-px flex-1 bg-white/15" />
             </div>
-            <p className="mt-0.5">more than just a moment.</p>
+            <p className="mt-0.5">Capture · Create · Inspire</p>
           </div>
         </div>
       </aside>

@@ -6,12 +6,14 @@ import {
   TELEGRAM_BOT_URL,
 } from '../data/studioData';
 import type { ServiceItem, TabId } from '../types';
+import {
+  filterServicesBySegment,
+  type ServiceSegmentFilter,
+} from '../utils/studioLogic';
 
 interface ServicesViewProps {
   onNavigate: (tab: TabId) => void;
 }
-
-type SegmentFilter = 'ALL' | 'B2B' | 'B2C';
 
 function ServiceCard({
   service,
@@ -23,49 +25,49 @@ function ServiceCard({
   onNavigate: (tab: TabId) => void;
 }) {
   return (
-    <article className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-[#EAEAEA] bg-white">
+    <article className="group flex flex-col justify-between overflow-hidden rounded-3xl border border-white/10 bg-[#111111] transition-colors duration-300 hover:border-[#FF4500]/50">
       <div>
-        <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#ECECEC]">
+        <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#080808]">
           <img
             src={service.image}
             alt={service.imageAlt}
             referrerPolicy="no-referrer"
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
           />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#111111]/70 via-transparent to-transparent" />
         </div>
 
-        <div className="p-6">
-          <div className="flex items-center justify-between gap-4 text-xs text-[#737373]">
-            <span className="tabular-nums font-medium">
+        <div className="p-6 sm:p-7">
+          <div className="flex items-center justify-between gap-4 text-xs text-white/50">
+            <span className="font-mono font-medium tabular-nums text-[#FF4500]">
               0{index + 1} · {service.duration}
             </span>
             <span>{service.priceStatus}</span>
           </div>
 
-          <h3 className="mt-3 font-editorial text-2xl font-medium leading-snug text-[#141414]">
+          <h3 className="mt-3 font-editorial text-2xl font-medium tracking-tight text-white">
             {service.title}
           </h3>
 
-          <p className="mt-2.5 text-[14.5px] leading-relaxed text-[#4A4A4A]">
+          <p className="mt-2.5 text-sm leading-relaxed text-gray-400">
             {service.description}
           </p>
         </div>
       </div>
 
-      <div className="border-t border-[#EFEFEF] px-6 py-4">
-        <p className="text-xs text-[#666666]">{service.deliverables}</p>
+      <div className="border-t border-white/10 px-6 py-4 sm:px-7">
+        <p className="text-xs text-white/55">{service.deliverables}</p>
         <div className="mt-3 flex items-center justify-between gap-4">
-          <span className="font-editorial text-xl font-medium text-[#141414]">
+          <span className="font-editorial text-base font-medium text-[#ffe0e0]">
             По запросу
           </span>
           <button
             type="button"
             onClick={() => onNavigate('booking')}
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-[#141414] underline underline-offset-4 transition-opacity hover:opacity-70"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-[#FF4500] transition-opacity hover:opacity-80"
           >
             <span>Записаться</span>
-            <ArrowRight className="h-3.5 w-3.5" />
+            <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-1" />
           </button>
         </div>
       </div>
@@ -74,60 +76,61 @@ function ServiceCard({
 }
 
 export function ServicesView({ onNavigate }: ServicesViewProps) {
-  const [segmentFilter, setSegmentFilter] = useState<SegmentFilter>('ALL');
+  const [segmentFilter, setSegmentFilter] =
+    useState<ServiceSegmentFilter>('ALL');
 
-  const b2bServices = SERVICE_CATEGORIES.filter((item) => item.segment === 'B2B');
-  const b2cServices = SERVICE_CATEGORIES.filter((item) => item.segment === 'B2C');
+  const b2bServices = filterServicesBySegment(SERVICE_CATEGORIES, 'B2B');
+  const b2cServices = filterServicesBySegment(SERVICE_CATEGORIES, 'B2C');
 
   return (
-    <div className="flex flex-col gap-7">
-      {/* Header Banner */}
-      <section className="rounded-2xl border border-[#EAEAEA] bg-white p-6 sm:p-10">
-        <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+    <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-10 px-4 py-12 sm:px-8 sm:py-16">
+      <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#111111] p-6 sm:p-10">
+        <div className="dot-matrix-bg pointer-events-none absolute inset-0 opacity-20" />
+        <div className="relative z-10 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
           <div>
-            <p className="text-[11px] font-medium tracking-[0.22em] text-[#666666]">
-              ФОРМАТЫ СЪЁМКИ И ПРАЙС-ЛИСТ
+            <p className="text-xs font-medium tracking-[0.2em] text-[#FF4500] uppercase">
+              Форматы съёмки и прайс-лист
             </p>
-            <h1 className="mt-2 font-editorial text-4xl font-normal text-[#141414] sm:text-5xl">
+            <h1 className="mt-2 font-editorial text-4xl font-medium tracking-tight text-[#ffe0e0] sm:text-5xl">
               Услуги: B2B и B2C
             </h1>
-            <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-[#4A4A4A]">
-              Услуги разделены на коммерческую съёмку для бизнеса (B2B) и частные
-              фотосессии (B2C). Примеры изображений временно подобраны для
-              визуализации разделов, а точный прайс-лист мы добавим позже.
+            <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-gray-400">
+              Услуги разделены на коммерческую съёмку для бизнеса (B2B) и
+              частные фотосессии (B2C). Примеры изображений временно подобраны
+              для визуализации разделов, а точный прайс-лист мы добавим позже.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 shrink-0">
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
             <button
               type="button"
               onClick={() => onNavigate('booking')}
-              className="inline-flex items-center gap-2 rounded-full bg-[#141414] px-6 py-3 text-[13.5px] font-medium text-white whitespace-nowrap shrink-0 transition-colors hover:bg-[#2B2B2B]"
+              className="inline-flex items-center gap-2 rounded-full bg-[#FF4500] px-5 py-2.5 text-xs font-semibold text-black whitespace-nowrap shrink-0 transition-transform hover:scale-[1.03]"
             >
-              <Calendar className="h-4 w-4" />
+              <Calendar className="h-3.5 w-3.5" />
               <span>Записаться на съёмку</span>
             </button>
             <a
               href={TELEGRAM_BOT_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-[#141414]/25 bg-white px-5 py-3 text-[13.5px] font-medium text-[#141414] whitespace-nowrap shrink-0 transition-colors hover:border-[#141414] hover:bg-[#F5F5F5]"
+              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-xs font-medium text-white whitespace-nowrap shrink-0 transition-colors hover:border-[#FF4500]/60 hover:bg-white/10"
             >
-              <Send className="h-4 w-4" />
+              <Send className="h-3.5 w-3.5" />
               <span>{TELEGRAM_BOT_HANDLE}</span>
             </a>
           </div>
         </div>
 
-        {/* Segment Switcher */}
-        <div className="mt-7 flex flex-wrap items-center gap-2 border-t border-[#EFEFEF] pt-6">
+        {/* Segmented Control */}
+        <div className="relative z-10 mt-7 inline-flex flex-wrap items-center gap-1 rounded-2xl border border-white/10 bg-[#050505] p-1">
           <button
             type="button"
             onClick={() => setSegmentFilter('ALL')}
-            className={`rounded-full px-4 py-2 text-xs font-medium whitespace-nowrap shrink-0 transition-colors ${
+            className={`rounded-xl px-4 py-2 text-xs font-medium whitespace-nowrap shrink-0 transition-colors ${
               segmentFilter === 'ALL'
-                ? 'bg-[#141414] text-white'
-                : 'border border-[#E5E5E5] bg-white text-[#4A4A4A] hover:border-[#141414] hover:text-[#141414]'
+                ? 'bg-[#FF4500] text-black font-semibold'
+                : 'text-white/60 hover:text-white'
             }`}
           >
             Все направления
@@ -135,56 +138,51 @@ export function ServicesView({ onNavigate }: ServicesViewProps) {
           <button
             type="button"
             onClick={() => setSegmentFilter('B2B')}
-            className={`rounded-full px-4 py-2 text-xs font-medium whitespace-nowrap shrink-0 transition-colors ${
+            className={`rounded-xl px-4 py-2 text-xs font-medium whitespace-nowrap shrink-0 transition-colors ${
               segmentFilter === 'B2B'
-                ? 'bg-[#141414] text-white'
-                : 'border border-[#E5E5E5] bg-white text-[#4A4A4A] hover:border-[#141414] hover:text-[#141414]'
+                ? 'bg-[#FF4500] text-black font-semibold'
+                : 'text-white/60 hover:text-white'
             }`}
           >
-            B2B · Для бизнеса и брендов
+            B2B · Для бизнеса
           </button>
           <button
             type="button"
             onClick={() => setSegmentFilter('B2C')}
-            className={`rounded-full px-4 py-2 text-xs font-medium whitespace-nowrap shrink-0 transition-colors ${
+            className={`rounded-xl px-4 py-2 text-xs font-medium whitespace-nowrap shrink-0 transition-colors ${
               segmentFilter === 'B2C'
-                ? 'bg-[#141414] text-white'
-                : 'border border-[#E5E5E5] bg-white text-[#4A4A4A] hover:border-[#141414] hover:text-[#141414]'
+                ? 'bg-[#FF4500] text-black font-semibold'
+                : 'text-white/60 hover:text-white'
             }`}
           >
-            B2C · Частные фотосессии
+            B2C · Частные съёмки
           </button>
         </div>
       </section>
 
-      {/* B2B Section */}
       {(segmentFilter === 'ALL' || segmentFilter === 'B2B') && (
-        <section className="flex flex-col gap-4">
-          <div className="flex flex-col justify-between gap-3 rounded-2xl border border-[#EAEAEA] bg-white p-6 sm:flex-row sm:items-center">
-            <div className="flex items-start gap-3.5">
-              <div className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#141414] text-white">
+        <section className="flex flex-col gap-5">
+          <div className="flex flex-col justify-between gap-4 rounded-3xl border border-[#FF4500]/30 bg-[#111111] p-6 sm:flex-row sm:items-center sm:px-8">
+            <div className="flex items-start gap-4">
+              <div className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#FF4500] text-black">
                 <Briefcase className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-[11px] font-medium tracking-[0.2em] text-[#666666]">
-                  РАЗДЕЛ B2B · КОММЕРЧЕСКАЯ СЪЁМКА
+                <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#FF4500]">
+                  Раздел B2B · Коммерческая съёмка
                 </p>
-                <h2 className="mt-1 font-editorial text-3xl font-medium text-[#141414]">
+                <h2 className="mt-0.5 font-editorial text-2xl font-medium tracking-tight text-white">
                   Съёмка для коммерции и бизнеса
                 </h2>
-                <p className="mt-1 text-sm text-[#4A4A4A]">
-                  Рекламные кампании, каталоги, деловые события и визуальный
-                  контент для компаний и экспертов.
-                </p>
               </div>
             </div>
 
-            <span className="text-xs font-medium text-[#666666] tabular-nums whitespace-nowrap">
+            <span className="font-mono text-xs font-medium text-white/55 tabular-nums whitespace-nowrap">
               {b2bServices.length} направления
             </span>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             {b2bServices.map((service, index) => (
               <ServiceCard
                 key={service.id}
@@ -197,34 +195,29 @@ export function ServicesView({ onNavigate }: ServicesViewProps) {
         </section>
       )}
 
-      {/* B2C Section */}
       {(segmentFilter === 'ALL' || segmentFilter === 'B2C') && (
-        <section className="flex flex-col gap-4">
-          <div className="flex flex-col justify-between gap-3 rounded-2xl border border-[#EAEAEA] bg-white p-6 sm:flex-row sm:items-center">
-            <div className="flex items-start gap-3.5">
-              <div className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#F2F2F2] text-[#141414]">
+        <section className="flex flex-col gap-5">
+          <div className="flex flex-col justify-between gap-4 rounded-3xl border border-white/10 bg-[#111111] p-6 sm:flex-row sm:items-center sm:px-8">
+            <div className="flex items-start gap-4">
+              <div className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-white/15 bg-white/5 text-[#ffe0e0]">
                 <Users className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-[11px] font-medium tracking-[0.2em] text-[#666666]">
-                  РАЗДЕЛ B2C · ЧАСТНЫЕ СЪЁМКИ
+                <p className="text-xs font-medium uppercase tracking-[0.14em] text-white/55">
+                  Раздел B2C · Частные съёмки
                 </p>
-                <h2 className="mt-1 font-editorial text-3xl font-medium text-[#141414]">
+                <h2 className="mt-0.5 font-editorial text-2xl font-medium tracking-tight text-white">
                   Личные, семейные и памятные истории
                 </h2>
-                <p className="mt-1 text-sm text-[#4A4A4A]">
-                  Свадьбы, семейные и детские фотосессии, выпускные альбомы и
-                  индивидуальные портреты.
-                </p>
               </div>
             </div>
 
-            <span className="text-xs font-medium text-[#666666] tabular-nums whitespace-nowrap">
+            <span className="font-mono text-xs font-medium text-white/55 tabular-nums whitespace-nowrap">
               {b2cServices.length} направления
             </span>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             {b2cServices.map((service, index) => (
               <ServiceCard
                 key={service.id}

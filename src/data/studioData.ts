@@ -10,11 +10,20 @@ import b2bCommercialFashion from '../assets/images/b2b_commercial_fashion_179529
 import b2bBusinessEvent from '../assets/images/b2b_business_event_1795290440999.jpg';
 import b2cWeddingStory from '../assets/images/b2c_wedding_story_1795290440522.jpg';
 import b2cFamilyPortrait from '../assets/images/b2c_family_portrait_1795290440989.jpg';
+import heroDarkAtmosphere from '../assets/images/hero_dark_atmosphere_1795294891237.jpg';
+import surrealHandLeft from '../assets/images/surreal_hand_left_1795294889815.jpg';
+import surrealHandRight from '../assets/images/surreal_hand_right_1795294890397.jpg';
 
 import type { HeroSlide, NewsItem, PortfolioItem, ServiceItem } from '../types';
 
 export const TELEGRAM_BOT_HANDLE = '@photoguuuy_bot';
 export const TELEGRAM_BOT_URL = 'https://t.me/photoguuuy_bot';
+
+export const DARK_HERO_ASSETS = {
+  atmosphere: heroDarkAtmosphere,
+  handLeft: surrealHandLeft,
+  handRight: surrealHandRight,
+};
 
 export const CARD_IMAGES = {
   about: cardAboutShadows,
