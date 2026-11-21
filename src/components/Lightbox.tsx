@@ -93,12 +93,28 @@ export function Lightbox({
           referrerPolicy="no-referrer"
           className="max-h-[75vh] w-auto rounded-xl object-contain shadow-2xl"
         />
-        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center text-sm text-white/85">
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center text-sm text-white/85">
           <span className="font-editorial text-xl text-white">{current.title}</span>
           <span aria-hidden="true" className="text-white/40">
             ·
           </span>
           <span>{current.category}</span>
+          {current.location && (
+            <>
+              <span aria-hidden="true" className="text-white/40">
+                ·
+              </span>
+              <span>{current.location}</span>
+            </>
+          )}
+          {current.camera && (
+            <>
+              <span aria-hidden="true" className="text-white/40">
+                ·
+              </span>
+              <span>{current.camera}</span>
+            </>
+          )}
           {current.exif && (
             <>
               <span aria-hidden="true" className="text-white/40">

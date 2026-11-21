@@ -14,6 +14,8 @@ const CATEGORIES: PortfolioCategory[] = [
   'Портреты',
   'Архитектура',
   'Город',
+  'Природа',
+  'Спорт',
 ];
 
 export function PortfolioView({
@@ -28,6 +30,8 @@ export function PortfolioView({
   const [title, setTitle] = useState('');
   const [category, setCategory] =
     useState<Exclude<PortfolioCategory, 'Все'>>('Портреты');
+  const [location, setLocation] = useState('');
+  const [camera, setCamera] = useState('');
   const [exif, setExif] = useState('');
   const [imageData, setImageData] = useState('');
   const [error, setError] = useState('');
@@ -52,8 +56,10 @@ export function PortfolioView({
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
-    if (!title.trim() || !imageData) {
-      setError('Выберите фотографию и укажите название работы.');
+    if (!title.trim() || !location.trim() || !camera.trim() || !imageData) {
+      setError(
+        'Укажите название, город съёмки, камеру (бренд и модель) и выберите фотографию.'
+      );
       return;
     }
 
@@ -61,6 +67,8 @@ export function PortfolioView({
       id: `work-${Date.now()}`,
       title: title.trim(),
       category,
+      location: location.trim(),
+      camera: camera.trim(),
       image: imageData,
       exif: exif.trim() || 'Авторская съёмка',
       year: String(new Date().getFullYear()),
@@ -68,6 +76,8 @@ export function PortfolioView({
 
     setTitle('');
     setCategory('Портреты');
+    setLocation('');
+    setCamera('');
     setExif('');
     setImageData('');
     setError('');
@@ -118,7 +128,7 @@ export function PortfolioView({
             Добавить фотографию в портфолио
           </h2>
 
-          <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div>
               <label
                 htmlFor="photo-title"
@@ -156,22 +166,69 @@ export function PortfolioView({
                 <option value="Портреты">Портреты</option>
                 <option value="Архитектура">Архитектура</option>
                 <option value="Город">Город</option>
+                <option value="Природа">Природа</option>
+                <option value="Спорт">Спорт</option>
               </select>
             </div>
 
             <div>
               <label
+                htmlFor="photo-location"
+                className="block text-xs font-medium text-[#4A4A4A]"
+              >
+                Где сделано (город)
+              </label>
+              <input
+                id="photo-location"
+                type="text"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="Например: Челябинск"
+                className="mt-1.5 w-full rounded-xl border border-[#DCDCDC] bg-[#FAFAFA] px-4 py-2.5 text-sm text-[#141414] focus:border-[#141414] focus:bg-white focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="photo-camera"
+                className="block text-xs font-medium text-[#4A4A4A]"
+              >
+                Камера (бренд и модель)
+              </label>
+              <input
+                id="photo-camera"
+                type="text"
+                list="camera-suggestions"
+                value={camera}
+                onChange={(e) => setCamera(e.target.value)}
+                placeholder="Например: Canon EOS R6, Nikon Z6 II"
+                className="mt-1.5 w-full rounded-xl border border-[#DCDCDC] bg-[#FAFAFA] px-4 py-2.5 text-sm text-[#141414] focus:border-[#141414] focus:bg-white focus:outline-none"
+              />
+              <datalist id="camera-suggestions">
+                <option value="Canon EOS R5" />
+                <option value="Canon EOS R6" />
+                <option value="Canon EOS 5D Mark IV" />
+                <option value="Nikon Z6 II" />
+                <option value="Nikon Z7 II" />
+                <option value="Nikon D850" />
+                <option value="Sony A7 IV" />
+                <option value="Fujifilm X-T5" />
+              </datalist>
+            </div>
+
+            <div className="sm:col-span-2 lg:col-span-2">
+              <label
                 htmlFor="photo-exif"
                 className="block text-xs font-medium text-[#4A4A4A]"
               >
-                Параметры (необязательно)
+                Параметры съёмки (необязательно)
               </label>
               <input
                 id="photo-exif"
                 type="text"
                 value={exif}
                 onChange={(e) => setExif(e.target.value)}
-                placeholder="50mm · f/1.8 · ISO 200"
+                placeholder="50mm · f/1.8 · 1/250s · ISO 200"
                 className="mt-1.5 w-full rounded-xl border border-[#DCDCDC] bg-[#FAFAFA] px-4 py-2.5 text-sm text-[#141414] focus:border-[#141414] focus:bg-white focus:outline-none"
               />
             </div>
@@ -238,8 +295,24 @@ export function PortfolioView({
       {filteredItems.length === 0 ? (
         <div className="rounded-2xl border border-[#EAEAEA] bg-white p-10 text-center">
           <p className="font-editorial text-2xl text-[#141414]">
-            В этой категории пока нет снимков
+            В категории «{selectedCategory}» пока нет снимков
           </p>
+          <p className="mt-2 text-sm text-[#666666]">
+            Вы можете загрузить свои фотографии прямо в этот раздел.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              if (selectedCategory !== 'Все') {
+                setCategory(selectedCategory);
+              }
+              setIsUploadOpen(true);
+            }}
+            className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#141414] px-5 py-2.5 text-xs font-medium text-white transition-colors hover:bg-[#2B2B2B]"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            <span>Загрузить фото</span>
+          </button>
         </div>
       ) : (
         <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -269,8 +342,12 @@ export function PortfolioView({
                       {item.title}
                     </h2>
                     <p className="mt-1 text-xs text-[#666666]">
-                      {item.category} ·{' '}
-                      <span className="tabular-nums">{item.exif}</span>
+                      {item.category}
+                      {item.location ? ` · ${item.location}` : ''}
+                      {item.camera ? ` · ${item.camera}` : ''}
+                    </p>
+                    <p className="mt-0.5 text-[11.5px] text-[#888888] tabular-nums">
+                      {item.exif}
                     </p>
                   </div>
 

@@ -17,13 +17,21 @@ export interface HeroSlide {
   imageAlt: string;
 }
 
-export type PortfolioCategory = 'Все' | 'Портреты' | 'Архитектура' | 'Город';
+export type PortfolioCategory =
+  | 'Все'
+  | 'Портреты'
+  | 'Архитектура'
+  | 'Город'
+  | 'Природа'
+  | 'Спорт';
 
 export interface PortfolioItem {
   id: string;
   title: string;
   category: Exclude<PortfolioCategory, 'Все'>;
   image: string;
+  location?: string;
+  camera?: string;
   exif: string;
   year: string;
 }
