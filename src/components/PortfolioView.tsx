@@ -1,6 +1,7 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react';
 import { Plus, Trash2, X } from 'lucide-react';
 import type { PortfolioCategory, PortfolioItem } from '../types';
+import { readAndOptimizeImage } from '../utils/imageUpload';
 import {
   filterPortfolioByCategory,
   validateAndCreatePortfolioItem,
@@ -8,6 +9,8 @@ import {
 
 interface PortfolioViewProps {
   items: PortfolioItem[];
+  selectedCategory: PortfolioCategory;
+  onChangeCategory: (category: PortfolioCategory) => void;
   onAddPhoto: (item: PortfolioItem) => void;
   onDeletePhoto: (id: string) => void;
   onOpenLightbox: (index: number) => void;
@@ -24,12 +27,12 @@ const CATEGORIES: PortfolioCategory[] = [
 
 export function PortfolioView({
   items,
+  selectedCategory,
+  onChangeCategory,
   onAddPhoto,
   onDeletePhoto,
   onOpenLightbox,
 }: PortfolioViewProps) {
-  const [selectedCategory, setSelectedCategory] =
-    useState<PortfolioCategory>('Все');
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [category, setCategory] =
@@ -42,17 +45,22 @@ export function PortfolioView({
 
   const filteredItems = filterPortfolioByCategory(items, selectedCategory);
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        setImageData(reader.result);
-      }
-    };
-    reader.readAsDataURL(file);
+    try {
+      const optimized = await readAndOptimizeImage(file);
+      setImageData(optimized);
+      setError('');
+    } catch (err) {
+      setImageData('');
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Не удалось обработать изображение.'
+      );
+    }
   };
 
   const handleSubmit = (event: FormEvent) => {
@@ -89,7 +97,7 @@ export function PortfolioView({
     <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-8 px-4 py-12 sm:px-8 sm:py-16">
       <section className="flex flex-col justify-between gap-6 rounded-3xl border border-white/10 bg-[#111111] p-6 sm:flex-row sm:items-end sm:p-10">
         <div>
-          <p className="text-xs font-medium tracking-[0.2em] text-[#FF4500] uppercase">
+          <p className="text-xs font-medium tracking-[0.2em] text-[#9D8EFF] uppercase">
             Избранные серии
           </p>
           <h1 className="mt-2 font-editorial text-4xl font-medium tracking-tight text-[#ffe0e0] sm:text-5xl">
@@ -103,8 +111,13 @@ export function PortfolioView({
 
         <button
           type="button"
-          onClick={() => setIsUploadOpen((prev) => !prev)}
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-[#FF4500] px-5 py-2.5 text-xs font-semibold text-black whitespace-nowrap shrink-0 transition-transform hover:scale-[1.03]"
+          onClick={() => {
+            if (!isUploadOpen && selectedCategory !== 'Все') {
+              setCategory(selectedCategory);
+            }
+            setIsUploadOpen((prev) => !prev);
+          }}
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-[#9D8EFF] px-5 py-2.5 text-xs font-semibold text-black whitespace-nowrap shrink-0 transition-transform hover:scale-[1.03]"
         >
           {isUploadOpen ? (
             <>
@@ -143,7 +156,7 @@ export function PortfolioView({
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Например: Вечерний портрет"
-                className="mt-1.5 w-full rounded-xl border border-white/15 bg-[#050505] px-4 py-2.5 text-sm text-white placeholder:text-white/35 focus:border-[#FF4500] focus:outline-none"
+                className="mt-1.5 w-full rounded-xl border border-white/15 bg-[#050505] px-4 py-2.5 text-sm text-white placeholder:text-white/35 focus:border-[#9D8EFF] focus:outline-none"
               />
             </div>
 
@@ -162,7 +175,7 @@ export function PortfolioView({
                     e.target.value as Exclude<PortfolioCategory, 'Все'>
                   )
                 }
-                className="mt-1.5 w-full rounded-xl border border-white/15 bg-[#050505] px-4 py-2.5 text-sm text-white focus:border-[#FF4500] focus:outline-none"
+                className="mt-1.5 w-full rounded-xl border border-white/15 bg-[#050505] px-4 py-2.5 text-sm text-white focus:border-[#9D8EFF] focus:outline-none"
               >
                 <option value="Портреты">Портреты</option>
                 <option value="Архитектура">Архитектура</option>
@@ -185,7 +198,7 @@ export function PortfolioView({
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="Например: Челябинск"
-                className="mt-1.5 w-full rounded-xl border border-white/15 bg-[#050505] px-4 py-2.5 text-sm text-white placeholder:text-white/35 focus:border-[#FF4500] focus:outline-none"
+                className="mt-1.5 w-full rounded-xl border border-white/15 bg-[#050505] px-4 py-2.5 text-sm text-white placeholder:text-white/35 focus:border-[#9D8EFF] focus:outline-none"
               />
             </div>
 
@@ -203,7 +216,7 @@ export function PortfolioView({
                 value={camera}
                 onChange={(e) => setCamera(e.target.value)}
                 placeholder="Например: Canon EOS R6, Nikon Z6 II"
-                className="mt-1.5 w-full rounded-xl border border-white/15 bg-[#050505] px-4 py-2.5 text-sm text-white placeholder:text-white/35 focus:border-[#FF4500] focus:outline-none"
+                className="mt-1.5 w-full rounded-xl border border-white/15 bg-[#050505] px-4 py-2.5 text-sm text-white placeholder:text-white/35 focus:border-[#9D8EFF] focus:outline-none"
               />
               <datalist id="camera-suggestions">
                 <option value="Canon EOS R5" />
@@ -230,7 +243,7 @@ export function PortfolioView({
                 value={exif}
                 onChange={(e) => setExif(e.target.value)}
                 placeholder="50mm · f/1.8 · 1/250s · ISO 200"
-                className="mt-1.5 w-full rounded-xl border border-white/15 bg-[#050505] px-4 py-2.5 text-sm text-white placeholder:text-white/35 focus:border-[#FF4500] focus:outline-none"
+                className="mt-1.5 w-full rounded-xl border border-white/15 bg-[#050505] px-4 py-2.5 text-sm text-white placeholder:text-white/35 focus:border-[#9D8EFF] focus:outline-none"
               />
             </div>
           </div>
@@ -247,12 +260,12 @@ export function PortfolioView({
               type="file"
               accept="image/*"
               onChange={handleFileChange}
-              className="mt-1.5 block w-full text-xs text-white/60 file:mr-3 file:rounded-full file:border file:border-white/15 file:bg-white/10 file:px-4 file:py-2 file:text-xs file:font-medium file:text-white hover:file:bg-[#FF4500] hover:file:text-black"
+              className="mt-1.5 block w-full text-xs text-white/60 file:mr-3 file:rounded-full file:border file:border-white/15 file:bg-white/10 file:px-4 file:py-2 file:text-xs file:font-medium file:text-white hover:file:bg-[#9D8EFF] hover:file:text-black"
             />
           </div>
 
           {error && (
-            <p role="alert" className="mt-3 text-xs font-medium text-[#FF6B4A]">
+            <p role="alert" className="mt-3 text-xs font-medium text-[#C4B5FD]">
               {error}
             </p>
           )}
@@ -267,7 +280,7 @@ export function PortfolioView({
             </button>
             <button
               type="submit"
-              className="rounded-full bg-[#FF4500] px-6 py-2.5 text-xs font-semibold text-black hover:opacity-90"
+              className="rounded-full bg-[#9D8EFF] px-6 py-2.5 text-xs font-semibold text-black hover:opacity-90"
             >
               Добавить в галерею
             </button>
@@ -289,10 +302,10 @@ export function PortfolioView({
               type="button"
               role="tab"
               aria-selected={active}
-              onClick={() => setSelectedCategory(cat)}
+              onClick={() => onChangeCategory(cat)}
               className={`rounded-xl px-4 py-2 text-xs font-medium whitespace-nowrap shrink-0 transition-colors ${
                 active
-                  ? 'bg-[#FF4500] text-black font-semibold'
+                  ? 'bg-[#9D8EFF] font-semibold text-black'
                   : 'text-white/60 hover:text-white'
               }`}
             >
@@ -318,7 +331,7 @@ export function PortfolioView({
               }
               setIsUploadOpen(true);
             }}
-            className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#FF4500] px-5 py-2.5 text-xs font-semibold text-black transition-transform hover:scale-[1.03]"
+            className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#9D8EFF] px-5 py-2.5 text-xs font-semibold text-black transition-transform hover:scale-[1.03]"
           >
             <Plus className="h-3.5 w-3.5" />
             <span>Загрузить фото</span>
@@ -331,13 +344,13 @@ export function PortfolioView({
             return (
               <article
                 key={item.id}
-                className="group overflow-hidden rounded-3xl border border-white/10 bg-[#111111] transition-colors duration-300 hover:border-[#FF4500]/50"
+                className="group overflow-hidden rounded-3xl border border-white/10 bg-[#111111] transition-colors duration-300 hover:border-[#9D8EFF]/50"
               >
                 <button
                   type="button"
                   onClick={() => onOpenLightbox(globalIndex)}
                   aria-label={`Открыть снимок: ${item.title}`}
-                  className="relative block aspect-[4/3] w-full overflow-hidden bg-[#080808] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4500]"
+                  className="relative block aspect-[4/3] w-full overflow-hidden bg-[#080808] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9D8EFF]"
                 >
                   <img
                     src={item.image}
@@ -353,7 +366,7 @@ export function PortfolioView({
                       {item.title}
                     </h2>
                     <p className="mt-1 text-xs text-white/65">
-                      <span className="text-[#FF4500]">{item.category}</span>
+                      <span className="text-[#9D8EFF]">{item.category}</span>
                       {item.location ? ` · ${item.location}` : ''}
                       {item.camera ? ` · ${item.camera}` : ''}
                     </p>

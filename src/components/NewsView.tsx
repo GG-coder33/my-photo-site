@@ -1,6 +1,7 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react';
 import { Plus, Trash2, X } from 'lucide-react';
 import type { NewsItem } from '../types';
+import { readAndOptimizeImage } from '../utils/imageUpload';
 import { validateAndCreateNewsItem } from '../utils/studioLogic';
 
 interface NewsViewProps {
@@ -21,17 +22,22 @@ export function NewsView({
   const [imageData, setImageData] = useState<string>('');
   const [error, setError] = useState('');
 
-  const handleImageUpload = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        setImageData(reader.result);
-      }
-    };
-    reader.readAsDataURL(file);
+    try {
+      const optimized = await readAndOptimizeImage(file);
+      setImageData(optimized);
+      setError('');
+    } catch (err) {
+      setImageData('');
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Не удалось обработать изображение.'
+      );
+    }
   };
 
   const handleSubmit = (event: FormEvent) => {
@@ -61,7 +67,7 @@ export function NewsView({
     <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-8 px-4 py-12 sm:px-8 sm:py-16">
       <section className="flex flex-col justify-between gap-6 rounded-3xl border border-white/10 bg-[#111111] p-6 sm:flex-row sm:items-end sm:p-10">
         <div>
-          <p className="text-xs font-medium tracking-[0.2em] text-[#FF4500] uppercase">
+          <p className="text-xs font-medium tracking-[0.2em] text-[#9D8EFF] uppercase">
             Журнал и обновления
           </p>
           <h1 className="mt-2 font-editorial text-4xl font-medium tracking-tight text-[#ffe0e0] sm:text-5xl">
@@ -76,7 +82,7 @@ export function NewsView({
         <button
           type="button"
           onClick={() => setIsFormOpen((prev) => !prev)}
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-[#FF4500] px-5 py-2.5 text-xs font-semibold text-black whitespace-nowrap shrink-0 transition-transform hover:scale-[1.03]"
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-[#9D8EFF] px-5 py-2.5 text-xs font-semibold text-black whitespace-nowrap shrink-0 transition-transform hover:scale-[1.03]"
         >
           {isFormOpen ? (
             <>
@@ -115,7 +121,7 @@ export function NewsView({
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Например: Открыта запись на зимние фотосессии"
-                className="mt-1.5 w-full rounded-xl border border-white/15 bg-[#050505] px-4 py-2.5 text-sm text-white placeholder:text-white/35 focus:border-[#FF4500] focus:outline-none"
+                className="mt-1.5 w-full rounded-xl border border-white/15 bg-[#050505] px-4 py-2.5 text-sm text-white placeholder:text-white/35 focus:border-[#9D8EFF] focus:outline-none"
               />
             </div>
 
@@ -132,7 +138,7 @@ export function NewsView({
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 placeholder="Анонс, Студия, Проект..."
-                className="mt-1.5 w-full rounded-xl border border-white/15 bg-[#050505] px-4 py-2.5 text-sm text-white placeholder:text-white/35 focus:border-[#FF4500] focus:outline-none"
+                className="mt-1.5 w-full rounded-xl border border-white/15 bg-[#050505] px-4 py-2.5 text-sm text-white placeholder:text-white/35 focus:border-[#9D8EFF] focus:outline-none"
               />
             </div>
           </div>
@@ -150,7 +156,7 @@ export function NewsView({
               value={excerpt}
               onChange={(e) => setExcerpt(e.target.value)}
               placeholder="Расскажите подробнее о событии, датах или условиях..."
-              className="mt-1.5 w-full rounded-xl border border-white/15 bg-[#050505] px-4 py-2.5 text-sm text-white placeholder:text-white/35 focus:border-[#FF4500] focus:outline-none"
+              className="mt-1.5 w-full rounded-xl border border-white/15 bg-[#050505] px-4 py-2.5 text-sm text-white placeholder:text-white/35 focus:border-[#9D8EFF] focus:outline-none"
             />
           </div>
 
@@ -166,12 +172,12 @@ export function NewsView({
               type="file"
               accept="image/*"
               onChange={handleImageUpload}
-              className="mt-1.5 block w-full text-xs text-white/60 file:mr-3 file:rounded-full file:border file:border-white/15 file:bg-white/10 file:px-4 file:py-2 file:text-xs file:font-medium file:text-white hover:file:bg-[#FF4500] hover:file:text-black"
+              className="mt-1.5 block w-full text-xs text-white/60 file:mr-3 file:rounded-full file:border file:border-white/15 file:bg-white/10 file:px-4 file:py-2 file:text-xs file:font-medium file:text-white hover:file:bg-[#9D8EFF] hover:file:text-black"
             />
           </div>
 
           {error && (
-            <p role="alert" className="mt-3 text-xs font-medium text-[#FF6B4A]">
+            <p role="alert" className="mt-3 text-xs font-medium text-[#C4B5FD]">
               {error}
             </p>
           )}
@@ -186,7 +192,7 @@ export function NewsView({
             </button>
             <button
               type="submit"
-              className="rounded-full bg-[#FF4500] px-6 py-2.5 text-xs font-semibold text-black hover:opacity-90"
+              className="rounded-full bg-[#9D8EFF] px-6 py-2.5 text-xs font-semibold text-black hover:opacity-90"
             >
               Опубликовать
             </button>
@@ -208,7 +214,7 @@ export function NewsView({
           {newsItems.map((item) => (
             <article
               key={item.id}
-              className="group flex flex-col justify-between overflow-hidden rounded-3xl border border-white/10 bg-[#111111] transition-colors duration-300 hover:border-[#FF4500]/50"
+              className="group flex flex-col justify-between overflow-hidden rounded-3xl border border-white/10 bg-[#111111] transition-colors duration-300 hover:border-[#9D8EFF]/50"
             >
               {item.image && (
                 <div className="h-52 w-full overflow-hidden bg-[#080808]">
@@ -225,7 +231,7 @@ export function NewsView({
                 <div>
                   <div className="flex items-center justify-between gap-2 text-xs text-white/55">
                     <div className="flex items-center gap-2">
-                      <span className="text-[#FF4500]">{item.category}</span>
+                      <span className="text-[#9D8EFF]">{item.category}</span>
                       <span aria-hidden="true">·</span>
                       <span className="tabular-nums">{item.date}</span>
                     </div>

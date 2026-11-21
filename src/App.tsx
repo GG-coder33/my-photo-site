@@ -10,7 +10,13 @@ import { PortfolioView } from './components/PortfolioView';
 import { ServicesView } from './components/ServicesView';
 import { Sidebar } from './components/Sidebar';
 import { DEFAULT_NEWS, DEFAULT_PORTFOLIO } from './data/studioData';
-import type { NewsItem, PortfolioItem, TabId } from './types';
+import type { NewsItem, PortfolioCategory, PortfolioItem, TabId } from './types';
+import type { ServiceSegmentFilter } from './utils/studioLogic';
+
+export interface NavigateOptions {
+  segment?: ServiceSegmentFilter;
+  category?: PortfolioCategory;
+}
 
 const STORAGE_KEYS = {
   portfolio: 'exposure_portfolio_v1',
@@ -30,6 +36,10 @@ function loadStoredArray<T>(key: string, fallback: T[]): T[] {
 
 export function App() {
   const [activeTab, setActiveTab] = useState<TabId>('home');
+  const [servicesSegment, setServicesSegment] =
+    useState<ServiceSegmentFilter>('ALL');
+  const [portfolioCategory, setPortfolioCategory] =
+    useState<PortfolioCategory>('Все');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [scrolled, setScrolled] = useState(false);
@@ -68,7 +78,13 @@ export function App() {
     }
   }, [newsItems]);
 
-  const handleNavigate = (tab: TabId) => {
+  const handleNavigate = (tab: TabId, options?: NavigateOptions) => {
+    if (tab === 'services') {
+      setServicesSegment(options?.segment ?? 'ALL');
+    }
+    if (tab === 'portfolio') {
+      setPortfolioCategory(options?.category ?? 'Все');
+    }
     setActiveTab(tab);
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
@@ -96,7 +112,7 @@ export function App() {
 
       <Sidebar
         activeTab={activeTab}
-        onSelectTab={handleNavigate}
+        onSelectTab={(tab) => handleNavigate(tab)}
         mobileMenuOpen={mobileMenuOpen}
         onToggleMobileMenu={() => setMobileMenuOpen((prev) => !prev)}
         scrolled={scrolled}
@@ -113,7 +129,11 @@ export function App() {
           )}
 
           {activeTab === 'services' && (
-            <ServicesView onNavigate={handleNavigate} />
+            <ServicesView
+              segmentFilter={servicesSegment}
+              onChangeSegment={setServicesSegment}
+              onNavigate={handleNavigate}
+            />
           )}
 
           {activeTab === 'news' && (
@@ -127,6 +147,8 @@ export function App() {
           {activeTab === 'portfolio' && (
             <PortfolioView
               items={portfolioItems}
+              selectedCategory={portfolioCategory}
+              onChangeCategory={setPortfolioCategory}
               onAddPhoto={handleAddPhoto}
               onDeletePhoto={handleDeletePhoto}
               onOpenLightbox={(index) => setLightboxIndex(index)}
@@ -140,7 +162,7 @@ export function App() {
           {activeTab === 'contacts' && <ContactsView />}
         </main>
 
-        <Footer onNavigate={handleNavigate} />
+        <Footer onNavigate={(tab) => handleNavigate(tab)} />
       </div>
 
       <Lightbox

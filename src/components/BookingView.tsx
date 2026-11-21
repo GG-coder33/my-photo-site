@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { Check, Copy, ExternalLink, Phone, Send } from 'lucide-react';
+import { Check, Copy, ExternalLink, MessageCircle, Send } from 'lucide-react';
 import {
+  PERSONAL_TELEGRAM_HANDLE,
+  PERSONAL_TELEGRAM_URL,
   SERVICE_CATEGORIES,
   TELEGRAM_BOT_HANDLE,
   TELEGRAM_BOT_URL,
@@ -9,6 +11,7 @@ import { formatBookingBrief } from '../utils/studioLogic';
 
 export function BookingView() {
   const [copiedBot, setCopiedBot] = useState(false);
+  const [copiedPersonal, setCopiedPersonal] = useState(false);
   const [copiedBrief, setCopiedBrief] = useState(false);
   const [shootType, setShootType] = useState(SERVICE_CATEGORIES[0].title);
   const [preferredDate, setPreferredDate] = useState('');
@@ -19,6 +22,16 @@ export function BookingView() {
       await navigator.clipboard.writeText(TELEGRAM_BOT_HANDLE);
       setCopiedBot(true);
       setTimeout(() => setCopiedBot(false), 2000);
+    } catch {
+      // Fallback ignored in restricted frames
+    }
+  };
+
+  const handleCopyPersonal = async () => {
+    try {
+      await navigator.clipboard.writeText(PERSONAL_TELEGRAM_HANDLE);
+      setCopiedPersonal(true);
+      setTimeout(() => setCopiedPersonal(false), 2000);
     } catch {
       // Fallback ignored in restricted frames
     }
@@ -43,21 +56,22 @@ export function BookingView() {
   return (
     <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-8 px-4 py-12 sm:px-8 sm:py-16">
       <section className="rounded-3xl border border-white/10 bg-[#111111] p-6 sm:p-10">
-        <p className="text-xs font-medium tracking-[0.2em] text-[#FF4500] uppercase">
+        <p className="text-xs font-medium tracking-[0.2em] text-[#9D8EFF] uppercase">
           Онлайн-запись
         </p>
         <h1 className="mt-2 font-editorial text-4xl font-medium tracking-tight text-[#ffe0e0] sm:text-5xl">
           Запись на съёмку
         </h1>
         <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-gray-400">
-          Чтобы выбрать дату и обсудить детали фотосессии, напишите в мой
-          Telegram-бот или свяжитесь по телефону.
+          Чтобы выбрать дату и обсудить детали фотосессии, напишите в
+          Telegram-бот {TELEGRAM_BOT_HANDLE} или мне напрямую в Telegram{' '}
+          {PERSONAL_TELEGRAM_HANDLE}.
         </p>
       </section>
 
       <section className="grid grid-cols-1 gap-5 lg:grid-cols-12">
         <div className="flex flex-col gap-5 lg:col-span-5">
-          <div className="rounded-3xl bg-[#FF4500] p-7 text-black shadow-[0_20px_50px_rgba(255,69,0,0.2)] sm:p-8">
+          <div className="rounded-3xl bg-[#9D8EFF] p-7 text-black shadow-[0_20px_50px_rgba(157,142,255,0.2)] sm:p-8">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-black/70">
               Основной способ связи
             </p>
@@ -106,26 +120,57 @@ export function BookingView() {
 
           <div className="rounded-3xl border border-white/10 bg-[#111111] p-7 sm:p-8">
             <div className="flex items-center gap-2.5 text-xs font-medium text-white/60">
-              <Phone className="h-4 w-4 text-[#FF4500]" />
-              <span>Телефон для связи</span>
+              <MessageCircle className="h-4 w-4 text-[#9D8EFF]" />
+              <span>Личный Telegram</span>
             </div>
-            <p className="mt-3 font-editorial text-2xl font-medium text-white tabular-nums">
-              +7 (•••) •••-••-••
+            <p className="mt-3 font-editorial text-2xl font-medium text-white">
+              {PERSONAL_TELEGRAM_HANDLE}
             </p>
             <p className="mt-1.5 text-xs leading-relaxed text-gray-400">
-              Номер телефона будет добавлен позже. Пока для связи и записи
-              используйте Telegram-бот {TELEGRAM_BOT_HANDLE}.
+              Напишите мне напрямую в Telegram, если хотите лично обсудить идею,
+              локацию или коммерческий проект.
             </p>
+
+            <div className="mt-5 flex flex-wrap items-center gap-2.5">
+              <a
+                href={PERSONAL_TELEGRAM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-semibold text-black transition-all hover:scale-[1.03] hover:bg-[#9D8EFF]"
+              >
+                <span>Написать {PERSONAL_TELEGRAM_HANDLE}</span>
+                <ExternalLink className="h-3.5 w-3.5" />
+              </a>
+
+              <button
+                type="button"
+                onClick={handleCopyPersonal}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-medium text-white/80 transition-colors hover:border-[#9D8EFF]/60 hover:text-white"
+              >
+                {copiedPersonal ? (
+                  <>
+                    <Check className="h-3.5 w-3.5 text-[#9D8EFF]" />
+                    <span>Скопировано</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-3.5 w-3.5" />
+                    <span>Копировать</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
 
         <div className="rounded-3xl border border-white/10 bg-[#111111] p-7 sm:p-8 lg:col-span-7">
           <h2 className="font-editorial text-2xl font-medium tracking-tight text-white sm:text-3xl">
-            Подготовить заявку для бота
+            Подготовить заявку для Telegram
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-gray-400">
             Заполните параметры съёмки — текст заявки скопируется в буфер
-            обмена, чтобы вы могли сразу отправить его в {TELEGRAM_BOT_HANDLE}.
+            обмена, чтобы вы могли сразу отправить его в {TELEGRAM_BOT_HANDLE}{' '}
+            или {PERSONAL_TELEGRAM_HANDLE}.
           </p>
 
           <div className="mt-6 flex flex-col gap-4">
@@ -140,7 +185,7 @@ export function BookingView() {
                 id="booking-type"
                 value={shootType}
                 onChange={(e) => setShootType(e.target.value)}
-                className="mt-1.5 w-full rounded-xl border border-white/15 bg-[#050505] px-4 py-2.5 text-sm text-white focus:border-[#FF4500] focus:outline-none"
+                className="mt-1.5 w-full rounded-xl border border-white/15 bg-[#050505] px-4 py-2.5 text-sm text-white focus:border-[#9D8EFF] focus:outline-none"
               >
                 {SERVICE_CATEGORIES.map((service) => (
                   <option key={service.id} value={service.title}>
@@ -163,7 +208,7 @@ export function BookingView() {
                 value={preferredDate}
                 onChange={(e) => setPreferredDate(e.target.value)}
                 placeholder="Например: ближайшие выходные, 14:00"
-                className="mt-1.5 w-full rounded-xl border border-white/15 bg-[#050505] px-4 py-2.5 text-sm text-white placeholder:text-white/35 focus:border-[#FF4500] focus:outline-none"
+                className="mt-1.5 w-full rounded-xl border border-white/15 bg-[#050505] px-4 py-2.5 text-sm text-white placeholder:text-white/35 focus:border-[#9D8EFF] focus:outline-none"
               />
             </div>
 
@@ -180,7 +225,7 @@ export function BookingView() {
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Кратко опишите, какая съёмка вам интересна..."
-                className="mt-1.5 w-full rounded-xl border border-white/15 bg-[#050505] px-4 py-2.5 text-sm text-white placeholder:text-white/35 focus:border-[#FF4500] focus:outline-none"
+                className="mt-1.5 w-full rounded-xl border border-white/15 bg-[#050505] px-4 py-2.5 text-sm text-white placeholder:text-white/35 focus:border-[#9D8EFF] focus:outline-none"
               />
             </div>
 
@@ -188,11 +233,11 @@ export function BookingView() {
               <button
                 type="button"
                 onClick={handleCopyAndOpenTelegram}
-                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-xs font-medium text-white whitespace-nowrap transition-colors hover:border-[#FF4500]/60 hover:bg-white/10"
+                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-xs font-medium text-white whitespace-nowrap transition-colors hover:border-[#9D8EFF]/60 hover:bg-white/10"
               >
                 {copiedBrief ? (
                   <>
-                    <Check className="h-3.5 w-3.5 text-[#FF4500]" />
+                    <Check className="h-3.5 w-3.5 text-[#9D8EFF]" />
                     <span>Текст скопирован</span>
                   </>
                 ) : (
@@ -208,7 +253,7 @@ export function BookingView() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={handleCopyAndOpenTelegram}
-                className="inline-flex items-center gap-2 rounded-full bg-[#FF4500] px-6 py-2.5 text-xs font-semibold text-black whitespace-nowrap transition-transform hover:scale-[1.03]"
+                className="inline-flex items-center gap-2 rounded-full bg-[#9D8EFF] px-6 py-2.5 text-xs font-semibold text-black whitespace-nowrap transition-transform hover:scale-[1.03]"
               >
                 <Send className="h-3.5 w-3.5" />
                 <span>Перейти в {TELEGRAM_BOT_HANDLE}</span>

@@ -80,7 +80,7 @@ function ApertureLogo() {
         cy="24"
         r="5"
         fill="#050505"
-        stroke="#FF4500"
+        stroke="#9D8EFF"
         strokeWidth="1.6"
       />
     </svg>
@@ -114,7 +114,7 @@ export function Sidebar({
         <button
           type="button"
           onClick={() => handleSelect('home')}
-          className="flex items-center gap-2.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4500]"
+          className="flex items-center gap-2.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9D8EFF]"
         >
           <ApertureLogo />
           <span className="font-editorial text-2xl font-medium tracking-tight text-white whitespace-nowrap">
@@ -126,7 +126,7 @@ export function Sidebar({
           <button
             type="button"
             onClick={() => handleSelect('booking')}
-            className="rounded-full bg-[#FF4500] px-4 py-2 text-xs font-semibold text-black whitespace-nowrap shrink-0 transition-transform hover:scale-105"
+            className="rounded-full bg-[#9D8EFF] px-4 py-2 text-xs font-semibold text-black whitespace-nowrap shrink-0 transition-transform hover:scale-105"
           >
             Записаться
           </button>
@@ -161,7 +161,7 @@ export function Sidebar({
             <button
               type="button"
               onClick={() => handleSelect('home')}
-              className="flex flex-col items-center text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4500]"
+              className="flex flex-col items-center text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9D8EFF]"
             >
               <ApertureLogo />
               <span className="mt-2 font-editorial text-[26px] font-medium tracking-tight leading-none text-white">
@@ -194,9 +194,9 @@ export function Sidebar({
                   type="button"
                   onClick={() => handleSelect(item.id)}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`flex w-full items-center gap-3 rounded-full px-4 py-2.5 text-left text-[13.5px] font-medium whitespace-nowrap shrink-0 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4500] ${
+                  className={`flex w-full items-center gap-3 rounded-full px-4 py-2.5 text-left text-[13.5px] font-medium whitespace-nowrap shrink-0 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9D8EFF] ${
                     isActive
-                      ? 'bg-[#FF4500] text-black shadow-[0_0_24px_rgba(255,69,0,0.35)]'
+                      ? 'bg-[#9D8EFF] font-semibold text-black shadow-[0_0_24px_rgba(157,142,255,0.35)]'
                       : 'text-white/65 hover:bg-white/10 hover:text-white'
                   }`}
                 >
@@ -222,7 +222,7 @@ export function Sidebar({
               rel="noopener noreferrer"
               aria-label="Telegram-бот @photoguuuy_bot"
               title="Telegram: @photoguuuy_bot"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/80 transition-all hover:border-[#FF4500] hover:bg-[#FF4500] hover:text-black"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-white/80 transition-all hover:border-[#9D8EFF] hover:bg-[#9D8EFF] hover:text-black"
             >
               <Send className="h-4 w-4" />
             </a>

@@ -10,6 +10,8 @@ import b2bCommercialFashion from '../assets/images/b2b_commercial_fashion_179529
 import b2bBusinessEvent from '../assets/images/b2b_business_event_1795290440999.jpg';
 import b2cWeddingStory from '../assets/images/b2c_wedding_story_1795290440522.jpg';
 import b2cFamilyPortrait from '../assets/images/b2c_family_portrait_1795290440989.jpg';
+import b2cGraduationAlbum from '../assets/images/b2c_graduation_album_1795298856943.jpg';
+import b2cPrivatePortrait from '../assets/images/b2c_private_portrait_1795298855823.jpg';
 import heroDarkAtmosphere from '../assets/images/hero_dark_atmosphere_1795294891237.jpg';
 import surrealHandLeft from '../assets/images/surreal_hand_left_1795294889815.jpg';
 import surrealHandRight from '../assets/images/surreal_hand_right_1795294890397.jpg';
@@ -18,6 +20,8 @@ import type { HeroSlide, NewsItem, PortfolioItem, ServiceItem } from '../types';
 
 export const TELEGRAM_BOT_HANDLE = '@photoguuuy_bot';
 export const TELEGRAM_BOT_URL = 'https://t.me/photoguuuy_bot';
+export const PERSONAL_TELEGRAM_HANDLE = '@Luccky33';
+export const PERSONAL_TELEGRAM_URL = 'https://t.me/Luccky33';
 
 export const DARK_HERO_ASSETS = {
   atmosphere: heroDarkAtmosphere,
@@ -204,8 +208,8 @@ export const SERVICE_CATEGORIES: ServiceItem[] = [
     priceStatus: 'Цена будет добавлена позже',
     description:
       'Современные выпускные фотосессии для школ, колледжей и вузов в студии и городских локациях.',
-    image: cardAboutShadows,
-    imageAlt: 'Пример художественного освещения для выпускных портретов',
+    image: b2cGraduationAlbum,
+    imageAlt: 'Выпускники в мантиях на фотосессии для выпускного альбома',
   },
   {
     id: 'b2c-portrait',
@@ -216,7 +220,7 @@ export const SERVICE_CATEGORIES: ServiceItem[] = [
     priceStatus: 'Цена будет добавлена позже',
     description:
       'Персональная фотосессия для себя: минималистичные студийные портреты, творческие образы и городские прогулки.',
-    image: portfolioSidePortrait,
-    imageAlt: 'Пример частного художественного портрета',
+    image: b2cPrivatePortrait,
+    imageAlt: 'Студийный чёрно-белый частный портрет',
   },
 ];

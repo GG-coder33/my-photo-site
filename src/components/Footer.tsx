@@ -22,7 +22,7 @@ export function Footer({ onNavigate }: FooterProps) {
                 href={TELEGRAM_BOT_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="transition-colors hover:text-[#FF4500]"
+                className="transition-colors hover:text-[#9D8EFF]"
               >
                 Telegram ({TELEGRAM_BOT_HANDLE})
               </a>

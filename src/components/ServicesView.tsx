@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { ArrowRight, Briefcase, Calendar, Send, Users } from 'lucide-react';
 import {
   SERVICE_CATEGORIES,
@@ -12,6 +11,8 @@ import {
 } from '../utils/studioLogic';
 
 interface ServicesViewProps {
+  segmentFilter: ServiceSegmentFilter;
+  onChangeSegment: (segment: ServiceSegmentFilter) => void;
   onNavigate: (tab: TabId) => void;
 }
 
@@ -25,7 +26,7 @@ function ServiceCard({
   onNavigate: (tab: TabId) => void;
 }) {
   return (
-    <article className="group flex flex-col justify-between overflow-hidden rounded-3xl border border-white/10 bg-[#111111] transition-colors duration-300 hover:border-[#FF4500]/50">
+    <article className="group flex flex-col justify-between overflow-hidden rounded-3xl border border-white/10 bg-[#111111] transition-colors duration-300 hover:border-[#9D8EFF]/50">
       <div>
         <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#080808]">
           <img
@@ -39,7 +40,7 @@ function ServiceCard({
 
         <div className="p-6 sm:p-7">
           <div className="flex items-center justify-between gap-4 text-xs text-white/50">
-            <span className="font-mono font-medium tabular-nums text-[#FF4500]">
+            <span className="font-mono font-medium tabular-nums text-[#9D8EFF]">
               0{index + 1} · {service.duration}
             </span>
             <span>{service.priceStatus}</span>
@@ -64,7 +65,7 @@ function ServiceCard({
           <button
             type="button"
             onClick={() => onNavigate('booking')}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-[#FF4500] transition-opacity hover:opacity-80"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-[#9D8EFF] transition-opacity hover:opacity-80"
           >
             <span>Записаться</span>
             <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-1" />
@@ -75,10 +76,11 @@ function ServiceCard({
   );
 }
 
-export function ServicesView({ onNavigate }: ServicesViewProps) {
-  const [segmentFilter, setSegmentFilter] =
-    useState<ServiceSegmentFilter>('ALL');
-
+export function ServicesView({
+  segmentFilter,
+  onChangeSegment,
+  onNavigate,
+}: ServicesViewProps) {
   const b2bServices = filterServicesBySegment(SERVICE_CATEGORIES, 'B2B');
   const b2cServices = filterServicesBySegment(SERVICE_CATEGORIES, 'B2C');
 
@@ -88,7 +90,7 @@ export function ServicesView({ onNavigate }: ServicesViewProps) {
         <div className="dot-matrix-bg pointer-events-none absolute inset-0 opacity-20" />
         <div className="relative z-10 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
           <div>
-            <p className="text-xs font-medium tracking-[0.2em] text-[#FF4500] uppercase">
+            <p className="text-xs font-medium tracking-[0.2em] text-[#9D8EFF] uppercase">
               Форматы съёмки и прайс-лист
             </p>
             <h1 className="mt-2 font-editorial text-4xl font-medium tracking-tight text-[#ffe0e0] sm:text-5xl">
@@ -105,7 +107,7 @@ export function ServicesView({ onNavigate }: ServicesViewProps) {
             <button
               type="button"
               onClick={() => onNavigate('booking')}
-              className="inline-flex items-center gap-2 rounded-full bg-[#FF4500] px-5 py-2.5 text-xs font-semibold text-black whitespace-nowrap shrink-0 transition-transform hover:scale-[1.03]"
+              className="inline-flex items-center gap-2 rounded-full bg-[#9D8EFF] px-5 py-2.5 text-xs font-semibold text-black whitespace-nowrap shrink-0 transition-transform hover:scale-[1.03]"
             >
               <Calendar className="h-3.5 w-3.5" />
               <span>Записаться на съёмку</span>
@@ -114,7 +116,7 @@ export function ServicesView({ onNavigate }: ServicesViewProps) {
               href={TELEGRAM_BOT_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-xs font-medium text-white whitespace-nowrap shrink-0 transition-colors hover:border-[#FF4500]/60 hover:bg-white/10"
+              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 text-xs font-medium text-white whitespace-nowrap shrink-0 transition-colors hover:border-[#9D8EFF]/60 hover:bg-white/10"
             >
               <Send className="h-3.5 w-3.5" />
               <span>{TELEGRAM_BOT_HANDLE}</span>
@@ -126,10 +128,10 @@ export function ServicesView({ onNavigate }: ServicesViewProps) {
         <div className="relative z-10 mt-7 inline-flex flex-wrap items-center gap-1 rounded-2xl border border-white/10 bg-[#050505] p-1">
           <button
             type="button"
-            onClick={() => setSegmentFilter('ALL')}
+            onClick={() => onChangeSegment('ALL')}
             className={`rounded-xl px-4 py-2 text-xs font-medium whitespace-nowrap shrink-0 transition-colors ${
               segmentFilter === 'ALL'
-                ? 'bg-[#FF4500] text-black font-semibold'
+                ? 'bg-[#9D8EFF] font-semibold text-black'
                 : 'text-white/60 hover:text-white'
             }`}
           >
@@ -137,10 +139,10 @@ export function ServicesView({ onNavigate }: ServicesViewProps) {
           </button>
           <button
             type="button"
-            onClick={() => setSegmentFilter('B2B')}
+            onClick={() => onChangeSegment('B2B')}
             className={`rounded-xl px-4 py-2 text-xs font-medium whitespace-nowrap shrink-0 transition-colors ${
               segmentFilter === 'B2B'
-                ? 'bg-[#FF4500] text-black font-semibold'
+                ? 'bg-[#9D8EFF] font-semibold text-black'
                 : 'text-white/60 hover:text-white'
             }`}
           >
@@ -148,10 +150,10 @@ export function ServicesView({ onNavigate }: ServicesViewProps) {
           </button>
           <button
             type="button"
-            onClick={() => setSegmentFilter('B2C')}
+            onClick={() => onChangeSegment('B2C')}
             className={`rounded-xl px-4 py-2 text-xs font-medium whitespace-nowrap shrink-0 transition-colors ${
               segmentFilter === 'B2C'
-                ? 'bg-[#FF4500] text-black font-semibold'
+                ? 'bg-[#9D8EFF] font-semibold text-black'
                 : 'text-white/60 hover:text-white'
             }`}
           >
@@ -162,13 +164,13 @@ export function ServicesView({ onNavigate }: ServicesViewProps) {
 
       {(segmentFilter === 'ALL' || segmentFilter === 'B2B') && (
         <section className="flex flex-col gap-5">
-          <div className="flex flex-col justify-between gap-4 rounded-3xl border border-[#FF4500]/30 bg-[#111111] p-6 sm:flex-row sm:items-center sm:px-8">
+          <div className="flex flex-col justify-between gap-4 rounded-3xl border border-[#9D8EFF]/30 bg-[#111111] p-6 sm:flex-row sm:items-center sm:px-8">
             <div className="flex items-start gap-4">
-              <div className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#FF4500] text-black">
+              <div className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#9D8EFF] text-black">
                 <Briefcase className="h-4 w-4" />
               </div>
               <div>
-                <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#FF4500]">
+                <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#9D8EFF]">
                   Раздел B2B · Коммерческая съёмка
                 </p>
                 <h2 className="mt-0.5 font-editorial text-2xl font-medium tracking-tight text-white">

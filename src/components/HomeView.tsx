@@ -6,10 +6,11 @@ import {
   TELEGRAM_BOT_URL,
 } from '../data/studioData';
 import type { PortfolioItem, TabId } from '../types';
+import type { NavigateOptions } from '../App';
 
 interface HomeViewProps {
   portfolioItems: PortfolioItem[];
-  onNavigate: (tab: TabId) => void;
+  onNavigate: (tab: TabId, options?: NavigateOptions) => void;
   onOpenLightbox: (index: number) => void;
 }
 
@@ -106,14 +107,14 @@ export function HomeView({
     <div ref={rootRef} className="flex flex-col bg-[#050505] text-white">
       {/* 1. Dark Atmospheric Hero with Floating Surrealist Hands & Scroll Parallax */}
       <section className="relative flex min-h-[88vh] items-center justify-center overflow-hidden bg-[#050505] px-6 py-24">
-        {/* Background Atmosphere */}
+        {/* Background Atmosphere (hue-shifted to harmonize with #9D8EFF accent) */}
         <div className="pointer-events-none absolute inset-0 z-0 select-none">
-          <div className="absolute inset-0 opacity-65 mix-blend-screen">
+          <div className="absolute inset-0 opacity-60 mix-blend-screen">
             <img
               src={DARK_HERO_ASSETS.atmosphere}
               alt="Darkroom light atmosphere"
               referrerPolicy="no-referrer"
-              className="h-full w-full object-cover object-center opacity-85"
+              className="h-full w-full object-cover object-center opacity-85 hue-rotate-[225deg] saturate-75"
             />
           </div>
           <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent via-transparent to-[#050505]" />
@@ -145,7 +146,7 @@ export function HomeView({
         <div className="relative z-20 mx-auto flex max-w-4xl flex-col items-center text-center">
           <div ref={heroWrapperRef}>
             <div className="reveal active">
-              <p className="mb-4 text-xs font-medium uppercase tracking-[0.26em] text-[#FF4500]">
+              <p className="mb-4 text-xs font-medium uppercase tracking-[0.26em] text-[#9D8EFF]">
                 Фотограф в Челябинске
               </p>
               <h1 className="hero-glow font-editorial text-5xl font-medium leading-[1.08] tracking-tight text-[#ffe0e0] sm:text-7xl lg:text-[84px]">
@@ -170,10 +171,10 @@ export function HomeView({
               <button
                 type="button"
                 onClick={() => onNavigate('booking')}
-                className="group relative cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4500]"
+                className="group relative cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9D8EFF]"
               >
-                <div className="absolute inset-0 rounded-full bg-[#FF4500]/25 blur-xl opacity-0 transition-opacity duration-500 group-hover:opacity-70" />
-                <div className="relative flex items-center gap-3 rounded-full border border-white/20 bg-white/5 px-7 py-2.5 text-xs uppercase tracking-[0.2em] text-white/90 backdrop-blur-sm transition-colors duration-300 group-hover:border-[#FF4500]/60 group-hover:bg-white/10 md:text-sm">
+                <div className="absolute inset-0 rounded-full bg-[#9D8EFF]/25 blur-xl opacity-0 transition-opacity duration-500 group-hover:opacity-70" />
+                <div className="relative flex items-center gap-3 rounded-full border border-white/20 bg-white/5 px-7 py-2.5 text-xs uppercase tracking-[0.2em] text-white/90 backdrop-blur-sm transition-colors duration-300 group-hover:border-[#9D8EFF]/60 group-hover:bg-white/10 md:text-sm">
                   <span>Записаться на съёмку</span>
                   <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </div>
@@ -205,31 +206,33 @@ export function HomeView({
           <div className="mt-24 grid grid-cols-2 items-center justify-items-center gap-8 opacity-45 grayscale transition-all duration-500 hover:opacity-80 hover:grayscale-0 md:grid-cols-4">
             <button
               type="button"
-              onClick={() => onNavigate('portfolio')}
-              className="reveal text-base font-bold tracking-[0.22em] text-white transition-colors hover:text-[#FF4500] sm:text-lg"
+              onClick={() =>
+                onNavigate('portfolio', { category: 'Портреты' })
+              }
+              className="reveal text-base font-bold tracking-[0.22em] text-white transition-colors hover:text-[#9D8EFF] sm:text-lg"
             >
               ПОРТРЕТЫ
             </button>
             <button
               type="button"
-              onClick={() => onNavigate('services')}
-              className="reveal text-base font-bold tracking-[0.22em] text-white transition-colors hover:text-[#FF4500] sm:text-lg"
+              onClick={() => onNavigate('services', { segment: 'B2B' })}
+              className="reveal text-base font-bold tracking-[0.22em] text-white transition-colors hover:text-[#9D8EFF] sm:text-lg"
               style={{ transitionDelay: '100ms' }}
             >
               КОММЕРЦИЯ
             </button>
             <button
               type="button"
-              onClick={() => onNavigate('services')}
-              className="reveal text-base font-bold tracking-[0.22em] text-white transition-colors hover:text-[#FF4500] sm:text-lg"
+              onClick={() => onNavigate('services', { segment: 'B2C' })}
+              className="reveal text-base font-bold tracking-[0.22em] text-white transition-colors hover:text-[#9D8EFF] sm:text-lg"
               style={{ transitionDelay: '200ms' }}
             >
               СВАДЬБЫ
             </button>
             <button
               type="button"
-              onClick={() => onNavigate('portfolio')}
-              className="reveal text-base font-bold tracking-[0.22em] text-white transition-colors hover:text-[#FF4500] sm:text-lg"
+              onClick={() => onNavigate('portfolio', { category: 'Город' })}
+              className="reveal text-base font-bold tracking-[0.22em] text-white transition-colors hover:text-[#9D8EFF] sm:text-lg"
               style={{ transitionDelay: '300ms' }}
             >
               ГОРОД
@@ -238,7 +241,7 @@ export function HomeView({
         </div>
       </section>
 
-      {/* 3. Dual Parallax Cards Section (B2B & B2C) */}
+      {/* 3. Dual Parallax Cards Section (B2B & B2C — dark by default, violet #9D8EFF on hover) */}
       <section className="relative overflow-hidden px-6 py-24 sm:py-32">
         <div className="dot-matrix-bg pointer-events-none absolute left-1/2 top-1/2 h-[120%] w-[120%] -translate-x-1/2 -translate-y-1/2 opacity-15" />
 
@@ -251,69 +254,69 @@ export function HomeView({
           </div>
 
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-            {/* Card 01 — Vermilion #FF4500 */}
+            {/* Card 01 — Dark Obsidian -> Violet #9D8EFF on hover */}
             <div className="parallax-card-down">
               <button
                 type="button"
-                onClick={() => onNavigate('services')}
-                className="reveal group flex aspect-[4/5] w-full cursor-pointer flex-col justify-between rounded-3xl bg-[#FF4500] p-8 text-left shadow-2xl transition-all duration-500 hover:shadow-[0_20px_50px_rgba(255,69,0,0.35)] sm:p-11"
+                onClick={() => onNavigate('services', { segment: 'B2B' })}
+                className="reveal group flex aspect-[4/5] w-full cursor-pointer flex-col justify-between rounded-3xl border border-white/10 bg-[#111111] p-8 text-left shadow-2xl transition-all duration-500 hover:border-[#9D8EFF] hover:bg-[#9D8EFF] hover:shadow-[0_20px_50px_rgba(157,142,255,0.35)] sm:p-11"
               >
                 <div className="flex w-full items-start justify-between">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-black/10 transition-transform duration-500 group-hover:rotate-45">
-                    <Star className="h-6 w-6 text-black" />
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/5 transition-all duration-500 group-hover:rotate-45 group-hover:bg-black/10">
+                    <Star className="h-6 w-6 text-white transition-colors duration-300 group-hover:text-black" />
                   </div>
-                  <span className="rounded-full border border-black/20 px-3 py-1 text-sm font-medium text-black tabular-nums">
+                  <span className="rounded-full border border-white/15 px-3 py-1 text-sm font-medium text-white/60 tabular-nums transition-colors duration-300 group-hover:border-black/20 group-hover:text-black">
                     01
                   </span>
                 </div>
 
                 <div>
-                  <h3 className="font-editorial text-4xl leading-none tracking-tight text-black sm:text-5xl">
+                  <h3 className="font-editorial text-4xl leading-none tracking-tight text-white transition-colors duration-300 group-hover:text-black sm:text-5xl">
                     B2B <br />
                     Для бизнеса
                   </h3>
-                  <p className="mt-4 text-base leading-snug text-black/80 sm:text-lg">
+                  <p className="mt-4 text-base leading-snug text-gray-400 transition-colors duration-300 group-hover:text-black/80 sm:text-lg">
                     Рекламная и имиджевая съёмка, каталоги и лукбуки,
                     бизнес-репортажи и контент для личного бренда.
                   </p>
                 </div>
 
-                <div className="mt-6 flex w-full items-center justify-between border-t border-black/15 pt-4 text-xs font-semibold uppercase tracking-[0.16em] text-black">
+                <div className="mt-6 flex w-full items-center justify-between border-t border-white/10 pt-4 text-xs font-semibold uppercase tracking-[0.16em] text-white/80 transition-colors duration-300 group-hover:border-black/15 group-hover:text-black">
                   <span>Открыть услуги B2B</span>
                   <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </div>
               </button>
             </div>
 
-            {/* Card 02 — Dark Obsidian #111111 */}
+            {/* Card 02 — Dark Obsidian -> Violet #9D8EFF on hover */}
             <div className="parallax-card-up md:mt-24">
               <button
                 type="button"
-                onClick={() => onNavigate('services')}
-                className="reveal group flex aspect-[4/5] w-full cursor-pointer flex-col justify-between rounded-3xl border border-white/10 bg-[#111111] p-8 text-left shadow-2xl transition-all duration-500 hover:border-[#FF4500]/50 sm:p-11"
+                onClick={() => onNavigate('services', { segment: 'B2C' })}
+                className="reveal group flex aspect-[4/5] w-full cursor-pointer flex-col justify-between rounded-3xl border border-white/10 bg-[#111111] p-8 text-left shadow-2xl transition-all duration-500 hover:border-[#9D8EFF] hover:bg-[#9D8EFF] hover:shadow-[0_20px_50px_rgba(157,142,255,0.35)] sm:p-11"
                 style={{ transitionDelay: '150ms' }}
               >
                 <div className="flex w-full items-start justify-between">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/5 transition-transform duration-500 group-hover:scale-110">
-                    <ArrowRight className="h-6 w-6 -rotate-45 text-white" />
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/5 transition-all duration-500 group-hover:scale-110 group-hover:bg-black/10">
+                    <ArrowRight className="h-6 w-6 -rotate-45 text-white transition-colors duration-300 group-hover:text-black" />
                   </div>
-                  <span className="rounded-full border border-white/15 px-3 py-1 text-sm font-medium text-white/60 tabular-nums">
+                  <span className="rounded-full border border-white/15 px-3 py-1 text-sm font-medium text-white/60 tabular-nums transition-colors duration-300 group-hover:border-black/20 group-hover:text-black">
                     02
                   </span>
                 </div>
 
                 <div>
-                  <h3 className="font-editorial text-4xl leading-none tracking-tight text-white sm:text-5xl">
+                  <h3 className="font-editorial text-4xl leading-none tracking-tight text-white transition-colors duration-300 group-hover:text-black sm:text-5xl">
                     B2C <br />
                     Личные истории
                   </h3>
-                  <p className="mt-4 text-base leading-snug text-gray-400 sm:text-lg">
+                  <p className="mt-4 text-base leading-snug text-gray-400 transition-colors duration-300 group-hover:text-black/80 sm:text-lg">
                     Фото свадьбы, семейные и детские фотосессии, выпускные
                     альбомы и индивидуальные портреты.
                   </p>
                 </div>
 
-                <div className="mt-6 flex w-full items-center justify-between border-t border-white/10 pt-4 text-xs font-semibold uppercase tracking-[0.16em] text-white/80 group-hover:text-[#FF4500]">
+                <div className="mt-6 flex w-full items-center justify-between border-t border-white/10 pt-4 text-xs font-semibold uppercase tracking-[0.16em] text-white/80 transition-colors duration-300 group-hover:border-black/15 group-hover:text-black">
                   <span>Открыть услуги B2C</span>
                   <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </div>
@@ -334,7 +337,7 @@ export function HomeView({
             <button
               type="button"
               onClick={() => onNavigate('portfolio')}
-              className="inline-flex w-fit items-center gap-2 text-xs font-medium uppercase tracking-[0.14em] text-[#FF4500] transition-opacity hover:opacity-80"
+              className="inline-flex w-fit items-center gap-2 text-xs font-medium uppercase tracking-[0.14em] text-[#9D8EFF] transition-opacity hover:opacity-80"
             >
               <span>Вся галерея</span>
               <ArrowRight className="h-3.5 w-3.5" />
@@ -348,7 +351,7 @@ export function HomeView({
                 type="button"
                 onClick={() => onOpenLightbox(idx)}
                 aria-label={`Открыть фотографию: ${item.title}`}
-                className="group relative aspect-square overflow-hidden rounded-xl border border-white/10 bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4500]"
+                className="group relative aspect-square overflow-hidden rounded-xl border border-white/10 bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9D8EFF]"
               >
                 <img
                   src={item.image}
@@ -375,7 +378,7 @@ export function HomeView({
               href={TELEGRAM_BOT_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-4 py-2.5 text-xs font-semibold text-black whitespace-nowrap transition-all hover:scale-[1.02] hover:bg-[#FF4500] hover:text-black"
+              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-4 py-2.5 text-xs font-semibold text-black whitespace-nowrap transition-all hover:scale-[1.02] hover:bg-[#9D8EFF] hover:text-black"
             >
               <Send className="h-3.5 w-3.5" />
               <span>Написать в Telegram</span>
