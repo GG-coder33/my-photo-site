@@ -82,8 +82,9 @@ export function ContactsView() {
         <div className="flex items-center gap-3">
           <MapPin className="h-4 w-4 shrink-0 text-[#4A4A4A]" />
           <p className="text-sm text-[#4A4A4A]">
-            Локация: <span className="font-medium text-[#141414]">Москва</span>{' '}
-            · возможны выездные и студийные съёмки
+            Локация:{' '}
+            <span className="font-medium text-[#141414]">Челябинск</span> ·
+            возможны выездные и студийные съёмки
           </p>
         </div>
 

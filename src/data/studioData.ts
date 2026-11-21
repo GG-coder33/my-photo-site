@@ -6,6 +6,10 @@ import portfolioCitySkyline from '../assets/images/portfolio_city_skyline_179528
 import portfolioConcreteFacade from '../assets/images/portfolio_concrete_facade_1795285996857.jpg';
 import portfolioSidePortrait from '../assets/images/portfolio_side_portrait_1795285997350.jpg';
 import portfolioLowTower from '../assets/images/portfolio_low_tower_1795285996585.jpg';
+import b2bCommercialFashion from '../assets/images/b2b_commercial_fashion_1795290441621.jpg';
+import b2bBusinessEvent from '../assets/images/b2b_business_event_1795290440999.jpg';
+import b2cWeddingStory from '../assets/images/b2c_wedding_story_1795290440522.jpg';
+import b2cFamilyPortrait from '../assets/images/b2c_family_portrait_1795290440989.jpg';
 
 import type { HeroSlide, NewsItem, PortfolioItem, ServiceItem } from '../types';
 
@@ -21,7 +25,7 @@ export const CARD_IMAGES = {
 export const HERO_SLIDES: HeroSlide[] = [
   {
     id: 'slide-1',
-    kicker: 'ФОТОГРАФ В МОСКВЕ',
+    kicker: 'ФОТОГРАФ В ЧЕЛЯБИНСКЕ',
     title: 'EXPOSURE',
     subtitle: 'CAPTURE · CREATE · INSPIRE',
     description:
@@ -108,40 +112,102 @@ export const DEFAULT_NEWS: NewsItem[] = [
 ];
 
 export const SERVICE_CATEGORIES: ServiceItem[] = [
+  // B2B — Коммерция и бизнес
   {
-    id: 'srv-portrait',
-    title: 'Индивидуальный портрет',
-    duration: '1–2 часа съёмки',
-    deliverables: 'Авторская цветокоррекция и отбор лучших кадров',
-    priceStatus: 'Цена будет добавлена позже',
-    description:
-      'Студийная или уличная портретная съёмка с акцентом на естественный свет, характер и композицию.',
-  },
-  {
-    id: 'srv-lovestory',
-    title: 'Парная съёмка и Love Story',
-    duration: '1,5–2 часа съёмки',
-    deliverables: 'Серия живых кадров и помощь с выбором локации',
-    priceStatus: 'Цена будет добавлена позже',
-    description:
-      'Непринуждённая прогулка или камерная студийная сессия, передающая искренние эмоции.',
-  },
-  {
-    id: 'srv-event',
-    title: 'Репортаж и мероприятия',
-    duration: 'От 2 часов',
-    deliverables: 'Оперативная подготовка ключевых кадров',
-    priceStatus: 'Цена будет добавлена позже',
-    description:
-      'Деловые события, выставки, камерные праздники и творческие встречи с деликатным репортажным подходом.',
-  },
-  {
-    id: 'srv-commercial',
-    title: 'Контент и архитектура',
+    id: 'b2b-advertising',
+    segment: 'B2B',
+    title: 'Рекламная и имиджевая съёмка',
     duration: 'По брифу',
-    deliverables: 'Снимки для брендов, интерьеров и изданий',
+    deliverables: 'Кадры для наружной рекламы, сайтов и кампаний бренда',
     priceStatus: 'Цена будет добавлена позже',
     description:
-      'Визуальные истории для пространств, персональных брендов и редакционных проектов.',
+      'Постановочная и студийная коммерческая съёмка для продвижения компаний, продуктов и визуального позиционирования бизнеса.',
+    image: b2bCommercialFashion,
+    imageAlt: 'Пример рекламной и имиджевой съёмки в студии',
+  },
+  {
+    id: 'b2b-catalog',
+    segment: 'B2B',
+    title: 'Каталожная съёмка и лукбуки',
+    duration: 'От 2 часов',
+    deliverables: 'Серии для одежды, обуви, украшений и маркетплейсов',
+    priceStatus: 'Цена будет добавлена позже',
+    description:
+      'Чистая предметная и fashion-съёмка коллекций одежды, обуви, аксессуаров и ювелирных изделий с точной передачей фактур.',
+    image: cardServicesStudio,
+    imageAlt: 'Студийный свет для каталожной съёмки и лукбуков',
+  },
+  {
+    id: 'b2b-event',
+    segment: 'B2B',
+    title: 'Бизнес-репортаж и мероприятия',
+    duration: 'От 2 часов',
+    deliverables: 'Оперативный отбор кадров для прессы и соцсетей',
+    priceStatus: 'Цена будет добавлена позже',
+    description:
+      'Репортажное сопровождение конференций, форумов, корпоративных событий, презентаций и деловых встреч.',
+    image: b2bBusinessEvent,
+    imageAlt: 'Пример бизнес-репортажа с делового мероприятия',
+  },
+  {
+    id: 'b2b-brand',
+    segment: 'B2B',
+    title: 'Контент-съёмка для экспертов и личного бренда',
+    duration: '1,5–3 часа',
+    deliverables: 'Визуальный банк фотографий на месяц и более',
+    priceStatus: 'Цена будет добавлена позже',
+    description:
+      'Деловые и лайфстайл-портреты для предпринимателей, специалистов и руководителей под соцсети, медиа и выступления.',
+    image: cardNewsCamera,
+    imageAlt: 'Рабочая атмосфера контент-съёмки для личного бренда',
+  },
+  // B2C — Частные съёмки
+  {
+    id: 'b2c-wedding',
+    segment: 'B2C',
+    title: 'Фото свадьбы',
+    duration: 'От 4 часов / полный день',
+    deliverables: 'Авторская обработка и полная история свадебного дня',
+    priceStatus: 'Цена будет добавлена позже',
+    description:
+      'Деликатная репортажная и постановочная съёмка сборов, церемонии, прогулки и банкета с живыми эмоциями.',
+    image: b2cWeddingStory,
+    imageAlt: 'Пример свадебной фотографии на прогулке',
+  },
+  {
+    id: 'b2c-family',
+    segment: 'B2C',
+    title: 'Семейные и детские фотосессии',
+    duration: '1–2 часа',
+    deliverables: 'Тёплые семейные кадры в студии, дома или на прогулке',
+    priceStatus: 'Цена будет добавлена позже',
+    description:
+      'Естественные съёмки с детьми и близкими без скованности — тёплые моменты, которые остаются в семейном архиве.',
+    image: b2cFamilyPortrait,
+    imageAlt: 'Пример семейной и детской фотосессии',
+  },
+  {
+    id: 'b2c-graduation',
+    segment: 'B2C',
+    title: 'Выпускные альбомы',
+    duration: 'Групповые и индивидуальные сессии',
+    deliverables: 'Портреты, общие кадры и подготовка макетов',
+    priceStatus: 'Цена будет добавлена позже',
+    description:
+      'Современные выпускные фотосессии для школ, колледжей и вузов в студии и городских локациях.',
+    image: cardAboutShadows,
+    imageAlt: 'Пример художественного освещения для выпускных портретов',
+  },
+  {
+    id: 'b2c-portrait',
+    segment: 'B2C',
+    title: 'Частные портреты',
+    duration: '1–2 часа',
+    deliverables: 'Индивидуальный подбор образов, света и локации',
+    priceStatus: 'Цена будет добавлена позже',
+    description:
+      'Персональная фотосессия для себя: минималистичные студийные портреты, творческие образы и городские прогулки.',
+    image: portfolioSidePortrait,
+    imageAlt: 'Пример частного художественного портрета',
   },
 ];

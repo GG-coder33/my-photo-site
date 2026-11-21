@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, ArrowRight, Calendar, Send } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Send } from 'lucide-react';
 import {
   CARD_IMAGES,
   HERO_SLIDES,
@@ -46,24 +46,12 @@ export function HomeView({
         </div>
 
         <div className="relative z-10 flex min-h-[380px] flex-col justify-between p-6 sm:p-10 lg:min-h-[430px] lg:p-12">
-          {/* Top-right outlined CTA */}
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <span className="text-[11px] font-medium tracking-[0.24em] text-[#404040]">
-                {currentSlide.kicker}
-              </span>
-              <span className="hidden h-px w-20 bg-[#141414]/45 sm:inline-block" />
-            </div>
-
-            <button
-              type="button"
-              onClick={() => onNavigate('booking')}
-              className="hidden items-center gap-2 rounded-full border border-[#141414]/35 bg-white/85 px-4 py-2 text-xs font-medium text-[#141414] whitespace-nowrap shrink-0 backdrop-blur-sm transition-colors hover:border-[#141414] hover:bg-[#141414] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#141414] sm:inline-flex"
-            >
-              <Calendar className="h-3.5 w-3.5" />
-              <span>Записаться на съёмку</span>
-              <ArrowRight className="h-3.5 w-3.5" />
-            </button>
+          {/* Top kicker */}
+          <div className="flex items-center gap-4">
+            <span className="text-[11px] font-medium tracking-[0.24em] text-[#404040]">
+              {currentSlide.kicker}
+            </span>
+            <span className="hidden h-px w-20 bg-[#141414]/45 sm:inline-block" />
           </div>
 
           {/* Center headline & lead */}

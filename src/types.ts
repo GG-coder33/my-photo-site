@@ -39,9 +39,12 @@ export interface NewsItem {
 
 export interface ServiceItem {
   id: string;
+  segment: 'B2B' | 'B2C';
   title: string;
   duration: string;
   deliverables: string;
   priceStatus: string;
   description: string;
+  image: string;
+  imageAlt: string;
 }
